@@ -1,5 +1,7 @@
 {
   "name": "teach",
+  "version": "2.0.0",
+  "description": "TeachAI 2.0 - AI-powered education analytics platform with smart grading, knowledge gap detection, and targeted question generation",
   "scripts": {
     "postinstall": "prisma generate && tsr generate",
     "dev": "vinxi dev",

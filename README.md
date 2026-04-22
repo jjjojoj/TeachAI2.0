@@ -1,185 +1,370 @@
-# 智学分析 - AI教育分析平台
+<div align="center">
 
-一个基于AI的智能教育分析平台，帮助教师分析学生作业、管理班级、跟踪学习进度，并提供数据驱动的教学洞察。
+# 智学分析 TeachAI 2.0
 
-## 🚀 功能特性
+AI 驱动的教育分析平台 —— 教师端 / 家长端 / 学生画像
 
-### 核心功能
-- **智能AI作业分析** - 使用先进的AI算法分析学生作业并提供详细反馈
-- **班级管理** - 创建和管理多个班级，邀请学生加入
-- **学习表现分析** - 可视化学生进度和班级整体表现
-- **批量上传处理** - 支持批量上传作业和考试试卷
-- **个性化报告生成** - 自动生成PDF和Excel格式的学习报告
+[中文](README.md) | [English](README.en.md)
 
-### AI功能
-- 作业自动评分和反馈
-- 知识盲点识别
-- 针对性题目生成
-- 学生信息自动识别
-- 多模型AI支持（OpenAI、Anthropic、Google、OpenRouter）
+![React 19](https://img.shields.io/badge/React-19-61DAFB?logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)
+![tRPC v11](https://img.shields.io/badge/tRPC-v11-398CCB?logo=trpc)
+![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?logo=prisma)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql)
+![TanStack Router](https://img.shields.io/badge/TanStack_Router-SSR-FF4154)
 
-### 管理功能
-- 教学资料库管理
-- 上传统计和分析
-- 班级晋升和归档
-- 邀请码管理
+</div>
 
-## 🛠️ 技术栈
+---
 
-### 前端
-- **React 19** - 用户界面框架
-- **TypeScript** - 类型安全
-- **TanStack Router** - 路由管理
-- **Tailwind CSS** - 样式设计
-- **tRPC** - 类型安全的API调用
+智学分析不是一个简单的作业批改工具，也不是一个只展示成绩的管理系统，而是一套围绕 **「AI 作业分析 → 知识盲点识别 → 针对性出题 → 学习轨迹跟踪 → 多维度报告」** 构建的教育分析闭环平台。
 
-### 后端
-- **Node.js** - 运行时环境
-- **tRPC** - 类型安全的API框架
-- **Prisma** - ORM数据库管理
-- **PostgreSQL** - 主数据库
-- **MinIO/OSS** - 文件存储
+> 面向 K12 教育场景，支持教师、家长双角色，通过多模型 AI 实现作业智能批改与学情洞察。
 
-### AI集成
-- **AI SDK** - 统一的AI服务接口
-- **多模型支持** - OpenAI、Anthropic、Google、OpenRouter
-- **OCR识别** - 学生信息自动识别
+---
 
-## 📦 安装和运行
+## 目录
+
+- [核心模块](#核心模块)
+- [系统架构](#系统架构)
+- [项目概览](#项目概览)
+- [快速开始](#快速开始)
+- [环境变量配置](#环境变量配置)
+- [数据库模型](#数据库模型)
+- [使用指南](#使用指南)
+- [技术栈详情](#技术栈详情)
+- [开发](#开发)
+- [许可证](#许可证)
+
+---
+
+## 核心模块
+
+<table>
+<tr>
+<td width="50%">
+
+<strong>🤖 AI 作业分析</strong><br/>
+上传作业图片 → AI 自动识别学生信息、批改内容、提取错题、分析知识薄弱点，生成结构化分析报告。
+
+</td>
+<td width="50%">
+
+<strong>📊 学情洞察面板</strong><br/>
+班级维度：成绩趋势、知识点掌握热力图、作业完成率统计。<br/>
+学生维度：个人画像、错题本、进步曲线、知识点雷达图。
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+<strong>📝 针对性题目生成</strong><br/>
+基于学生知识盲点，AI 自动生成针对性练习题，支持多种题型和难度梯度。
+
+</td>
+<td width="50%">
+
+<strong>👥 多角色协作</strong><br/>
+<strong>教师端</strong>：创建班级、上传作业、查看报告、管理学生分组。<br/>
+<strong>家长端</strong>：关联学生、上传作业、查看学习进度。
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+<strong>📚 教学资料库</strong><br/>
+教师上传和管理教学资料（PDF/图片），支持分类整理和快速检索。
+
+</td>
+<td width="50%">
+
+<strong>📈 报告生成</strong><br/>
+一键生成 Excel / PDF 格式的班级报告，包含成绩分析、知识点分布、学生排名等。
+
+</td>
+</tr>
+</table>
+
+---
+
+## 系统架构
+
+```mermaid
+flowchart TB
+    subgraph Client["客户端 (SPA)"]
+        Teacher["教师端"]
+        Parent["家长端"]
+        Router["TanStack Router<br/>SSR + Code Splitting"]
+    end
+
+    subgraph API["API 层 (tRPC v11)"]
+        Auth["认证 / 鉴权"]
+        ClassMgmt["班级管理"]
+        Upload["作业上传"]
+        Analysis["AI 分析"]
+        Report["报告生成"]
+        Material["教学资料"]
+    end
+
+    subgraph AI["AI 服务层"]
+        OCR["OCR 识别"]
+        Grading["作业批改"]
+        QuestionGen["题目生成"]
+        MultiModel["多模型适配<br/>OpenRouter / SiliconCloud / 百炼"]
+    end
+
+    subgraph Data["数据层"]
+        PG[("PostgreSQL")]
+        OSS[("阿里云 OSS<br/>文件存储")]
+    end
+
+    Teacher --> Router
+    Parent --> Router
+    Router --> API
+    API --> AI
+    API --> Data
+    Upload --> OSS
+    Analysis --> AI
+    Analysis --> PG
+```
+
+---
+
+## 项目概览
+
+| 项目 | 说明 |
+| --- | --- |
+| 主要用途 | AI 教育分析、学情洞察、针对性出题 |
+| 前端框架 | React 19 + TanStack Router (SSR) |
+| API 方案 | tRPC v11 (全栈类型安全) |
+| 数据库 | PostgreSQL 16 + Prisma ORM |
+| 文件存储 | 阿里云 OSS |
+| AI 模型 | OpenRouter / SiliconCloud / 阿里云百炼 (多模型切换) |
+| 部署方式 | Vinxi + Nitro (Node Server) |
+
+---
+
+## 快速开始
 
 ### 环境要求
+
 - Node.js 18+
 - PostgreSQL 12+
 - pnpm 8+
 
-### 快速开始
+### 1. 克隆项目
 
-1. **克隆项目**
 ```bash
-git clone <repository-url>
-cd teach
+git clone https://github.com/jjjojoj/TeachAI2.0.git
+cd TeachAI2.0
 ```
 
-2. **安装依赖**
+### 2. 安装依赖
+
 ```bash
 pnpm install
 ```
 
-3. **环境配置**
-复制环境变量文件并配置：
+### 3. 配置环境变量
+
 ```bash
 cp .env.example .env
 ```
-编辑 `.env` 文件，配置数据库连接和AI服务密钥。
 
-4. **数据库设置**
+编辑 `.env`，填入数据库连接和 API 密钥（详见 [环境变量配置](#环境变量配置)）。
+
+### 4. 初始化数据库
+
 ```bash
-# 生成Prisma客户端
-pnpm run postinstall
+# 推送 Schema 到数据库（开发环境）
+pnpm db:push
 
-# 运行数据库迁移
-pnpm run db:generate
-pnpm run db:migrate
+# 或使用迁移（生产环境）
+pnpm db:generate
+pnpm db:migrate
 ```
 
-5. **启动开发服务器**
+### 5. 启动开发服务器
+
 ```bash
-pnpm run dev
+pnpm dev
 ```
+
+访问 `http://localhost:3000`。
 
 ### 生产部署
 
-1. **构建项目**
 ```bash
-pnpm run build
+pnpm build
+pnpm start
 ```
-
-2. **启动生产服务器**
-```bash
-pnpm run start
-```
-
-## 🔧 配置说明
-
-### 环境变量
-
-必需配置：
-```env
-DATABASE_URL="postgresql://username:password@localhost:5432/teach"
-```
-
-AI服务配置（至少配置一个）：
-```env
-OPENAI_API_KEY="your-openai-key"
-ANTHROPIC_API_KEY="your-anthropic-key"
-GOOGLE_AI_API_KEY="your-google-ai-key"
-OPENROUTER_API_KEY="your-openrouter-key"
-```
-
-文件存储配置：
-```env
-MINIO_ENDPOINT="minio.example.com"
-MINIO_ACCESS_KEY="your-access-key"
-MINIO_SECRET_KEY="your-secret-key"
-MINIO_BUCKET="teach-bucket"
-```
-
-### 数据库架构
-
-项目使用Prisma管理数据库，主要包含以下模型：
-- 教师(Teacher)和家长(Parent)账户管理
-- 学生(Student)信息和班级(Class)管理
-- 作业(Assignment)和考试(Exam)记录
-- AI分析结果(AssignmentAnalysis/ExamAnalysis)
-- 知识点(KnowledgeArea)和错题(Mistake)管理
-- 教学资料(TeachingMaterial)库
-
-## 📖 使用指南
-
-### 教师端使用
-
-1. **注册登录** - 使用手机号注册教师账号
-2. **创建班级** - 在仪表板中创建新班级，获取邀请码
-3. **学生管理** - 通过邀请码邀请学生加入班级
-4. **作业上传** - 上传学生作业图片进行AI分析
-5. **查看报告** - 在班级页面查看学生表现和分析报告
-
-### 家长端使用
-
-1. **注册登录** - 使用手机号注册家长账号
-2. **关联学生** - 输入学生信息关联到账号
-3. **上传作业** - 上传孩子作业图片
-4. **查看进度** - 查看孩子的学习进度和分析报告
-
-### API使用
-
-项目提供完整的tRPC API，支持类型安全的客户端调用。所有API端点都在 `src/server/trpc` 目录中定义。
-
-## 🤝 贡献指南
-
-1. Fork 项目
-2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 开启Pull Request
-
-## 📄 许可证
-
-本项目采用MIT许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
-
-## 🆘 支持
-
-如果您遇到问题或有疑问：
-1. 查看 [使用手册](./USER_MANUAL.md) 获取详细指导
-2. 检查 [常见问题](./FAQ.md)
-3. 提交 Issue 到GitHub仓库
-
-## 🙏 致谢
-
-- 感谢所有贡献者和用户
-- 使用到的开源项目和库
-- AI服务提供商的支持
 
 ---
 
-**智学分析** - 用AI智能分析改变教育方式 🎓
+## 环境变量配置
+
+```env
+# ===== 基础配置 =====
+NODE_ENV=development
+DATABASE_URL="postgresql://user:password@localhost:5432/teachai"
+ADMIN_PASSWORD="your-admin-password"
+JWT_SECRET="your-jwt-secret-key"
+BASE_URL="http://localhost:3000"
+
+# ===== AI 服务（至少配置一个） =====
+OPENROUTER_API_KEY="sk-or-..."
+SILICONCLOUD_API_KEY="sk-..."
+ALIBABA_BAILIAN_API_KEY="sk-..."
+
+# ===== 阿里云 OSS（文件存储） =====
+OSS_ACCESS_KEY_ID="your-access-key-id"
+OSS_ACCESS_KEY_SECRET="your-access-key-secret"
+OSS_ENDPOINT="https://oss-cn-hangzhou.aliyuncs.com"
+OSS_BUCKET="teachai-bucket"
+OSS_REGION="oss-cn-hangzhou"
+```
+
+> 完整示例见 [`.env.example`](.env.example)。
+
+---
+
+## 数据库模型
+
+项目使用 Prisma ORM，共 15 个数据模型：
+
+```mermaid
+erDiagram
+    Teacher ||--o{ Class : "创建"
+    Teacher ||--o{ TeacherKnowledgeArea : "擅长"
+    Teacher ||--o{ TeachingMaterial : "上传"
+    Parent ||--o{ Student : "关联"
+    Class ||--o{ Student : "包含"
+    Class ||--o{ StudentGroup : "分组"
+    Student ||--o{ Assignment : "提交作业"
+    Student ||--o{ Exam : "提交考试"
+    Student ||--o{ StudentKnowledgeArea : "掌握情况"
+    Student }o--o| StudentGroup : "属于"
+    Assignment ||--o| AssignmentAnalysis : "AI分析"
+    Exam ||--o| ExamAnalysis : "AI分析"
+    AssignmentAnalysis ||--o{ Mistake : "错题"
+    ExamAnalysis ||--o{ ExamMistake : "错题"
+    Mistake }o--|| KnowledgeArea : "涉及"
+    ExamMistake }o--|| KnowledgeArea : "涉及"
+    KnowledgeArea ||--o{ StudentKnowledgeArea : "被掌握"
+```
+
+---
+
+## 使用指南
+
+### 教师端
+
+1. **注册登录** — 手机号注册教师账号
+2. **创建班级** — 输入班级名称，系统生成邀请码
+3. **邀请学生** — 分享邀请码，学生/家长通过邀请码加入
+4. **上传作业** — 批量上传学生作业图片，AI 自动分析
+5. **查看报告** — 班级维度和学生维度的多维度学情报告
+6. **生成题目** — 基于知识薄弱点自动生成针对性练习
+7. **管理资料** — 上传和管理教学资料库
+
+### 家长端
+
+1. **注册登录** — 手机号注册家长账号
+2. **关联学生** — 输入学生姓名和学号关联到账号
+3. **上传作业** — 上传孩子作业图片进行 AI 分析
+4. **查看进度** — 查看孩子的学习进度、知识掌握情况和错题本
+
+---
+
+## 技术栈详情
+
+### 前端
+
+| 技术 | 用途 |
+| --- | --- |
+| React 19 | UI 框架 |
+| TypeScript 5 | 类型安全 |
+| TanStack Router | SSR 路由 + 自动代码分割 |
+| TanStack Query | 服务端状态管理 |
+| tRPC Client | 端到端类型安全 API 调用 |
+| Tailwind CSS | 样式系统 |
+| Headless UI | 无障碍 UI 组件 |
+| Recharts | 数据可视化图表 |
+
+### 后端
+
+| 技术 | 用途 |
+| --- | --- |
+| tRPC v11 | 类型安全 API 框架 |
+| Prisma | 数据库 ORM |
+| PostgreSQL | 主数据库 |
+| Vinxi + Nitro | 应用构建 & 服务端运行时 |
+| 阿里云 OSS | 文件存储 |
+| JWT | 认证鉴权 |
+
+### AI 集成
+
+| 能力 | 说明 |
+| --- | --- |
+| 作业 OCR | 自动识别学生信息、学号、姓名 |
+| 作业批改 | AI 分析作业内容，提取对错 |
+| 错题提取 | 自动提取错题并关联知识点 |
+| 知识盲点分析 | 多维度分析学生知识薄弱点 |
+| 针对性出题 | 基于薄弱点生成练习题 |
+| 多模型支持 | OpenRouter / SiliconCloud / 阿里云百炼 |
+
+---
+
+## 开发
+
+### 项目结构
+
+```
+TeachAI2.0/
+├── src/
+│   ├── routes/              # 页面路由 (TanStack Router)
+│   │   ├── auth/            # 登录注册
+│   │   ├── dashboard/       # 教师仪表板
+│   │   ├── classes/         # 班级管理
+│   │   └── parent-dashboard/# 家长端
+│   ├── components/          # React 组件 (19个)
+│   ├── server/
+│   │   ├── trpc/
+│   │   │   ├── procedures/  # tRPC 过程 (38个)
+│   │   │   └── root.ts      # 路由聚合
+│   │   ├── ai-service.ts    # AI 服务层
+│   │   ├── storage.ts       # OSS 文件存储
+│   │   └── env.ts           # 环境变量校验
+│   ├── stores/              # 状态管理
+│   └── types/               # 类型定义
+├── prisma/
+│   ├── schema.prisma        # 数据库模型 (15个)
+│   └── migrations/          # 数据库迁移
+├── public/                  # 静态资源
+├── app.config.ts            # Vinxi 应用配置
+└── package.json
+```
+
+### 可用脚本
+
+```bash
+pnpm dev          # 启动开发服务器
+pnpm build        # 生产构建
+pnpm start        # 启动生产服务器
+pnpm db:push      # 推送 Schema 到数据库
+pnpm db:generate  # 生成 Prisma 迁移
+pnpm db:migrate   # 执行数据库迁移
+pnpm db:studio    # 打开 Prisma Studio
+```
+
+---
+
+## 许可证
+
+本项目采用 [MIT 许可证](LICENSE)。
+
+---
+
+**智学分析 TeachAI 2.0** — 用 AI 智能分析改变教育方式

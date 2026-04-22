@@ -16,6 +16,9 @@ img.jpg
 # 敏感信息
 teachAI阿里云oss.txt
 
+# 旧代码（迁移前的 legacy 副本，构建不依赖）
+imported-src/
+
 # 未使用功能
 src/components/BatchAddStudentsModal.tsx
 
