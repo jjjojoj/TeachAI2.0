@@ -57,8 +57,6 @@ export function CreateClassModal({ isOpen, onClose }: CreateClassModalProps) {
       return;
     }
 
-    console.log("Starting class creation with data:", { name: data.name, description: data.description, initialStudentCount: data.initialStudentCount });
-
     try {
       const result = await createClassMutation.mutateAsync({
         authToken,
@@ -66,8 +64,6 @@ export function CreateClassModal({ isOpen, onClose }: CreateClassModalProps) {
         description: data.description,
         initialStudentCount: data.initialStudentCount,
       });
-
-      console.log("Class creation successful:", result);
       setInviteCode(result.class.invitationCode);
       setShowInviteCode(true);
       
@@ -79,19 +75,9 @@ export function CreateClassModal({ isOpen, onClose }: CreateClassModalProps) {
       toast.success(`班级"${result.class.name}"创建成功！`);
       reset();
     } catch (error: any) {
-      console.error("Create class error details:", {
-        error,
-        message: error.message,
-        stack: error.stack,
-        cause: error.cause,
-        data: error.data,
-        shape: error.shape
-      });
-      
       // Check if it's a network/JSON parse error
       if (error.message && error.message.includes("JSON.parse")) {
         toast.error("服务器响应格式错误，请检查网络连接或联系管理员");
-        console.error("This appears to be a server-side error returning non-JSON response");
       } else if (error.message && error.message.includes("fetch")) {
         toast.error("网络连接错误，请检查网络连接");
       } else if (error.data?.code === "UNAUTHORIZED") {

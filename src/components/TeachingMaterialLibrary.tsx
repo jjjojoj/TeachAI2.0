@@ -86,7 +86,6 @@ export function TeachingMaterialLibrary({ onGenerateQuestions, onClose }: Teachi
     },
     onError: (error) => {
       toast.error('删除失败，请重试');
-      console.error('Delete error:', error);
     },
   });
 

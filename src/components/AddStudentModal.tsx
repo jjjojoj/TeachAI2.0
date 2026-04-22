@@ -119,7 +119,6 @@ export function AddStudentModal({ isOpen, onClose, classId, onSuccess }: AddStud
       onSuccess?.();
       onClose();
     } catch (error: any) {
-      console.error("Add student error:", error);
       toast.error(error.message || "添加学生失败");
     }
   };
@@ -245,7 +244,6 @@ export function AddStudentModal({ isOpen, onClose, classId, onSuccess }: AddStud
 
       return students;
     } catch (error) {
-      console.error('Excel parsing error:', error);
       throw new Error('Excel文件解析失败，请检查文件格式');
     }
   };
@@ -508,7 +506,6 @@ export function AddStudentModal({ isOpen, onClose, classId, onSuccess }: AddStud
         },
       });
     } catch (error: any) {
-      console.error('Analysis error:', error);
 
       let errorMessage = inputMode === 'image' ? '图片分析失败，请重试' : '处理失败，请重试';
 
@@ -666,7 +663,6 @@ export function AddStudentModal({ isOpen, onClose, classId, onSuccess }: AddStud
         handleClose();
       }
     } catch (error: any) {
-      console.error('Batch add error:', error);
       toast.error(error.message || '批量添加学生失败');
       setBatchStep('review');
     }

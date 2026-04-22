@@ -1,15 +1,13 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useAuthStore } from "~/stores/authStore";
 import { 
   GraduationCap, 
-  BookOpen, 
   Users, 
   TrendingUp, 
   Sparkles,
   ArrowRight,
   Brain,
-  Target,
   Award
 } from "lucide-react";
 
@@ -20,48 +18,18 @@ export const Route = createFileRoute("/")({
 function Home() {
   const navigate = useNavigate();
   const { isAuthenticated, userRole } = useAuthStore();
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (isAuthenticated) {
-        if (userRole === "parent") {
-          navigate({ to: "/parent-dashboard" });
-        } else {
-          navigate({ to: "/dashboard" });
-        }
+    if (isAuthenticated) {
+      if (userRole === "parent") {
+        navigate({ to: "/parent-dashboard" });
       } else {
-        navigate({ to: "/auth" });
+        navigate({ to: "/dashboard" });
       }
-    }, 2000); // Show the landing page for 2 seconds
-
-    return () => clearTimeout(timer);
+    } else {
+      navigate({ to: "/auth" });
+    }
   }, [isAuthenticated, userRole, navigate]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
-        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-        <div className="relative text-center animate-fade-in">
-          <div className="w-24 h-24 bg-gradient-primary rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-glow-lg float-medium">
-            <GraduationCap className="w-12 h-12 text-white" />
-          </div>
-          <h1 className="text-4xl font-bold text-gradient-primary mb-4">智学分析</h1>
-          <p className="text-xl text-gray-600 mb-8">用AI改变教育</p>
-          <div className="flex justify-center space-x-2">
-            <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse" style={{ animationDelay: '0s' }}></div>
-            <div className="w-3 h-3 bg-indigo-500 rounded-full animate-pulse" style={{ animationDelay: '0.3s' }}></div>
-            <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse" style={{ animationDelay: '0.6s' }}></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 overflow-hidden">
@@ -80,8 +48,8 @@ function Home() {
             </div>
             
             <h1 className="text-6xl md:text-7xl font-bold mb-6 animate-slide-up">
-              <span className="text-gradient-primary">智学</span>
-              <span className="text-gray-900">分析</span>
+              <span className="text-gradient-primary">智评</span>
+              <span className="text-gray-900">EduReview</span>
             </h1>
             
             <p className="text-2xl md:text-3xl text-gray-600 mb-8 animate-slide-up" style={{ animationDelay: '0.2s' }}>

@@ -71,7 +71,6 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
       toast.success("账户创建成功！请登录。");
       onSuccess?.();
     } catch (error: any) {
-      console.error("Registration error:", error);
       toast.error(error.message || "注册失败");
     }
   };

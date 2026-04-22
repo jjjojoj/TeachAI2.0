@@ -178,7 +178,6 @@ function ClassDetail() {
         studentsQuery.refetch();
       }
     } catch (error: any) {
-      console.error('删除学生失败:', error);
       toast.error(error.message || '删除学生失败，请重试');
     }
   };
@@ -199,7 +198,6 @@ function ClassDetail() {
         studentsQuery.refetch();
       }
     } catch (error: any) {
-      console.error('切换特别关注失败:', error);
       toast.error(error.message || '切换特别关注失败，请重试');
     }
   };
@@ -228,7 +226,6 @@ function ClassDetail() {
         groupsQuery.refetch();
       }
     } catch (error: any) {
-      console.error('分配学生到小组失败:', error);
       toast.error(error.message || '分配学生到小组失败，请重试');
     }
   };
@@ -250,7 +247,6 @@ function ClassDetail() {
         groupsQuery.refetch();
       }
     } catch (error: any) {
-      console.error('创建小组失败:', error);
       toast.error(error.message || '创建小组失败，请重试');
       throw error; // Re-throw to let the modal handle it
     }

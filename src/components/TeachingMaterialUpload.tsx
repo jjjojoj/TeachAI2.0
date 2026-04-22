@@ -155,7 +155,6 @@ export function TeachingMaterialUpload({ onSuccess, onClose }: TeachingMaterialU
 
       return urlData.objectUrl;
     } catch (error) {
-      console.error('File upload error:', error);
       throw error;
     }
   };
@@ -197,7 +196,6 @@ export function TeachingMaterialUpload({ onSuccess, onClose }: TeachingMaterialU
       setUploadedFile(null);
       onSuccess?.();
     } catch (error) {
-      console.error('Upload error:', error);
       toast.error('上传失败，请重试');
     } finally {
       setIsUploading(false);

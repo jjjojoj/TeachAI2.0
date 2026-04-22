@@ -1,6 +1,6 @@
 <div align="center">
 
-# 慧析 HuiXi
+# 智评 EduReview
 
 AI 驱动的教育分析平台 —— 教师端 / 家长端 / 学生画像
 
@@ -157,8 +157,8 @@ flowchart TB
 ### 1. 克隆项目
 
 ```bash
-git clone https://github.com/jjjojoj/hui-xi.git
-cd hui-xi
+git clone https://github.com/jjjojoj/edureview.git
+cd edureview
 ```
 
 ### 2. 安装依赖
@@ -322,7 +322,7 @@ erDiagram
 ### 项目结构
 
 ```
-hui-xi/
+edureview/
 ├── src/
 │   ├── routes/              # 页面路由 (TanStack Router)
 │   │   ├── auth/            # 登录注册
@@ -367,4 +367,4 @@ pnpm db:studio    # 打开 Prisma Studio
 
 ---
 
-**慧析 HuiXi** — 用 AI 智能分析改变教育方式
+**智评 EduReview** — 用 AI 智能分析改变教育方式

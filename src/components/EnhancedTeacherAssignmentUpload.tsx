@@ -281,7 +281,6 @@ export function EnhancedTeacherAssignmentUpload({
         setShowCamera(true);
       }
     } catch (error) {
-      console.error('Camera access error:', error);
       toast.error('Unable to access camera');
     }
   };
@@ -344,7 +343,6 @@ export function EnhancedTeacherAssignmentUpload({
 
       return urlResponse.objectUrl;
     } catch (error) {
-      console.error('OSS upload error:', error);
       throw new Error('Failed to upload file to storage');
     }
   };
@@ -459,7 +457,6 @@ export function EnhancedTeacherAssignmentUpload({
       }
       
     } catch (error: any) {
-      console.error(`Processing error for ${fileId}:`, error);
       const file = files[fileIndex];
       
       if (file && file.retryCount < 3) {

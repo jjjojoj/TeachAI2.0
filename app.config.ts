@@ -86,11 +86,25 @@ export default createApp({
         reactRefresh(),
         nodePolyfills(),
         consoleForwardPlugin({
-          enabled: true,
+          enabled: process.env.NODE_ENV === "development",
           endpoint: "/api/debug/client-logs",
           levels: ["log", "warn", "error", "info", "debug"],
         }),
       ],
+      vite: {
+        build: {
+          rollupOptions: {
+            output: {
+              manualChunks: {
+                "vendor-react": ["react", "react-dom"],
+                "vendor-tanstack": ["@tanstack/react-router", "@tanstack/react-query"],
+                "vendor-trpc": ["@trpc/client", "@trpc/react-query"],
+                "vendor-recharts": ["recharts"],
+              },
+            },
+          },
+        },
+      },
     },
   ],
 });

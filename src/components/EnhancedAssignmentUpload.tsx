@@ -232,7 +232,6 @@ export function EnhancedAssignmentUpload({
         setShowCamera(true);
       }
     } catch (error) {
-      console.error('Camera access error:', error);
       toast.error('无法访问摄像头');
     }
   };
@@ -293,7 +292,6 @@ export function EnhancedAssignmentUpload({
 
       return urlResponse.objectUrl;
     } catch (error) {
-      console.error('OSS upload error:', error);
       throw new Error('上传文件到存储失败');
     }
   };
@@ -346,7 +344,6 @@ export function EnhancedAssignmentUpload({
       setCompletedCount(prev => prev + 1);
       
     } catch (error: any) {
-      console.error(`Processing error for ${fileId}:`, error);
       const file = files[fileIndex];
       
       if (file && file.retryCount < 3) {

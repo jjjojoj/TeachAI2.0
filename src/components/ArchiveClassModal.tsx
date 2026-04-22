@@ -102,7 +102,6 @@ export function ArchiveClassModal({ isOpen, onClose, classId, className, onSucce
         onSuccess();
       }
     } catch (error: any) {
-      console.error("Archive class error:", error);
       toast.error(error.message || "归档班级失败，请稍后重试");
       setStep('choice');
     }
@@ -138,7 +137,6 @@ export function ArchiveClassModal({ isOpen, onClose, classId, className, onSucce
         onSuccess();
       }
     } catch (error: any) {
-      console.error("Promote class error:", error);
       toast.error(error.message || "升级班级失败，请稍后重试");
       setStep('choice');
     }

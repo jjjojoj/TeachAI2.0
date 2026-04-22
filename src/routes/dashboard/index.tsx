@@ -1,11 +1,14 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTRPC } from "~/trpc/react";
 import { useAuthStore } from "~/stores/authStore";
-import { CreateClassModal } from "~/components/CreateClassModal";
-import { TeachingMaterialLibrary } from "~/components/TeachingMaterialLibrary";
-import { TargetedQuestionGenerator } from "~/components/TargetedQuestionGenerator";
+
+const CreateClassModal = lazy(() => import("~/components/CreateClassModal").then(m => ({ default: m.CreateClassModal })));
+const TeachingMaterialLibrary = lazy(() => import("~/components/TeachingMaterialLibrary").then(m => ({ default: m.TeachingMaterialLibrary })));
+const TargetedQuestionGenerator = lazy(() => import("~/components/TargetedQuestionGenerator").then(m => ({ default: m.TargetedQuestionGenerator })));
+
+const LoadingSpinner = () => <div className="flex items-center justify-center p-8 text-gray-500">加载中...</div>;
 import { 
   Plus, 
   Users, 
@@ -430,18 +433,22 @@ function Dashboard() {
       </div>
 
       {/* Create Class Modal */}
-      <CreateClassModal
-        isOpen={isCreateClassModalOpen}
-        onClose={() => setIsCreateClassModalOpen(false)}
-      />
+      <Suspense fallback={<LoadingSpinner />}>
+        <CreateClassModal
+          isOpen={isCreateClassModalOpen}
+          onClose={() => setIsCreateClassModalOpen(false)}
+        />
+      </Suspense>
 
       {/* Teaching Materials Library */}
       {showTeachingMaterials && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden">
-            <TeachingMaterialLibrary 
-              onClose={() => setShowTeachingMaterials(false)}
-            />
+            <Suspense fallback={<LoadingSpinner />}>
+              <TeachingMaterialLibrary
+                onClose={() => setShowTeachingMaterials(false)}
+              />
+            </Suspense>
           </div>
         </div>
       )}
@@ -450,9 +457,11 @@ function Dashboard() {
       {showQuestionGenerator && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-auto">
-            <TargetedQuestionGenerator 
-              onClose={() => setShowQuestionGenerator(false)}
-            />
+            <Suspense fallback={<LoadingSpinner />}>
+              <TargetedQuestionGenerator
+                onClose={() => setShowQuestionGenerator(false)}
+              />
+            </Suspense>
           </div>
         </div>
       )}

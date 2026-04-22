@@ -99,7 +99,6 @@ export function TargetedQuestionGenerator({ classId, studentId, onClose }: Targe
     },
     onError: (error) => {
       toast.error('生成练习题失败，请重试');
-      console.error('Question generation error:', error);
     },
   });
 

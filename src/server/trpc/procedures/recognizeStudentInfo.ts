@@ -62,7 +62,7 @@ export const recognizeStudentInfoProcedure = authedProcedure
     }
   });
 
-export const getAvailableModelsProcedure = baseProcedure
+export const getAvailableModelsProcedure = authedProcedure
   .query(() => {
     return {
       models: getAvailableVisionModels(),

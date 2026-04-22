@@ -28,7 +28,6 @@ class ErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    console.error("[ErrorBoundary] Uncaught error:", error, info.componentStack);
   }
 
   handleReset = () => {
