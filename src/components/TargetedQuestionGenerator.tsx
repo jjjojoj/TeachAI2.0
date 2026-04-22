@@ -67,7 +67,7 @@ export function TargetedQuestionGenerator({ classId, studentId, onClose }: Targe
     watch,
     setValue,
   } = useForm<QuestionGenerationFormData>({
-    resolver: zodResolver(questionGenerationSchema),
+    resolver: zodResolver(questionGenerationSchema) as any,
     defaultValues: {
       studentId: studentId || undefined,
       questionCount: 5,
@@ -77,22 +77,23 @@ export function TargetedQuestionGenerator({ classId, studentId, onClose }: Targe
 
   // Get class students if classId is provided
   const { data: studentsData } = useQuery({
-    queryKey: ['classStudents', classId],
-    queryFn: () => trpc.getClassStudents.query({
+    ...trpc.getClassStudents.queryOptions({
       authToken: authToken!,
       classId: classId!,
     }),
     enabled: !!authToken && !!classId,
   });
 
+  const students = (studentsData as any)?.students ?? [];
+
   // Generate questions mutation
   const generateMutation = useMutation({
     mutationFn: (data: QuestionGenerationFormData) => 
-      trpc.generateTargetedQuestions.mutate({
+      (trpc as any).generateTargetedQuestions.mutateAsync({
         authToken: authToken!,
         ...data,
       }),
-    onSuccess: (result) => {
+    onSuccess: (result: any) => {
       setGeneratedQuestions(result);
       toast.success(`成功生成 ${result.questions.length} 道练习题！`);
     },
@@ -101,8 +102,6 @@ export function TargetedQuestionGenerator({ classId, studentId, onClose }: Targe
       console.error('Question generation error:', error);
     },
   });
-
-  const students = studentsData?.students || [];
 
   const onSubmit = async (data: QuestionGenerationFormData) => {
     if (!authToken) {
@@ -333,7 +332,7 @@ ${q.options ? q.options.map((option, i) => `${String.fromCharCode(65 + i)}. ${op
         )}
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit as any)} className="space-y-6">
         {/* Student Selection */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -345,7 +344,7 @@ ${q.options ? q.options.map((option, i) => `${String.fromCharCode(65 + i)}. ${op
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">请选择学生</option>
-            {students.map((student) => (
+            {students.map((student: any) => (
               <option key={student.id} value={student.id}>
                 {student.name}
               </option>

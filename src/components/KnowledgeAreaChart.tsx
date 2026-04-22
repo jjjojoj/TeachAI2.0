@@ -59,18 +59,18 @@ export const KnowledgeAreaChart: React.FC<KnowledgeAreaChartProps> = ({
 
   // Process data for trend lines
   const trendData = React.useMemo(() => {
-    const dateMap = new Map<string, Record<string, number>>();
+    const dateMap = new Map<string, Record<string, string | number>>();
     
     data.forEach(point => {
       if (!dateMap.has(point.date)) {
-        dateMap.set(point.date, { date: point.date });
+        dateMap.set(point.date, { date: point.date } as Record<string, string | number>);
       }
       const dateData = dateMap.get(point.date)!;
       dateData[point.knowledgeArea] = point.proficiency * 33.33;
     });
     
     return Array.from(dateMap.values()).sort((a, b) => 
-      new Date(a.date).getTime() - new Date(b.date).getTime()
+      new Date(a.date as string).getTime() - new Date(b.date as string).getTime()
     );
   }, [data]);
 

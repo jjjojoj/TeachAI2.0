@@ -38,7 +38,7 @@ export const analyzeAssignmentProcedure = baseProcedure
         });
       }
 
-      if (assignment.student.parent?.id !== parsed.parentId) {
+      if (!assignment.student || assignment.student.parent?.id !== parsed.parentId) {
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "You can only analyze your own child's assignments",
@@ -95,8 +95,7 @@ export const analyzeAssignmentProcedure = baseProcedure
           await tx.mistake.create({
             data: {
               description: mistake.description,
-              studentId: assignment.studentId,
-              assignmentId: input.assignmentId,
+              studentId: assignment.studentId!,
               knowledgeAreaId: knowledgeArea.id,
             },
           });
@@ -105,7 +104,7 @@ export const analyzeAssignmentProcedure = baseProcedure
           const existingProficiency = await tx.studentKnowledgeArea.findUnique({
             where: {
               studentId_knowledgeAreaId: {
-                studentId: assignment.studentId,
+                studentId: assignment.studentId!,
                 knowledgeAreaId: knowledgeArea.id,
               },
             },
@@ -116,17 +115,18 @@ export const analyzeAssignmentProcedure = baseProcedure
             await tx.studentKnowledgeArea.update({
               where: { id: existingProficiency.id },
               data: {
-                proficiency: Math.max(0, existingProficiency.proficiency - 0.1),
-                lastUpdated: new Date(),
+                proficiencyLevel: existingProficiency.proficiencyLevel
+                  ? String(Math.max(0, parseFloat(existingProficiency.proficiencyLevel) - 0.1))
+                  : 'beginner',
               },
             });
           } else {
             // Create new proficiency record starting at 0.5 (neutral)
             await tx.studentKnowledgeArea.create({
               data: {
-                studentId: assignment.studentId,
+                studentId: assignment.studentId!,
                 knowledgeAreaId: knowledgeArea.id,
-                proficiency: 0.4, // Start slightly below neutral due to mistake
+                proficiencyLevel: 'beginner', // Start slightly below neutral due to mistake
               },
             });
           }

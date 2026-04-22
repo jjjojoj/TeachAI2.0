@@ -340,7 +340,7 @@ export const generateClassReportExcel = baseProcedure
         success: true,
         downloadUrl,
         fileName: `${classData.name}-数据报告-${new Date().toLocaleDateString('zh-CN')}.xlsx`,
-        fileSize: excelBuffer.length,
+        fileSize: (excelBuffer as Buffer).byteLength,
         expiresIn: 3600,
       };
 

@@ -53,8 +53,7 @@ export function TeachingMaterialLibrary({ onGenerateQuestions, onClose }: Teachi
 
   // Fetch teaching materials
   const { data: materialsData, isLoading, error } = useQuery({
-    queryKey: ['teachingMaterials', selectedContentType, selectedKnowledgeArea],
-    queryFn: () => trpc.getTeachingMaterials.query({
+    ...trpc.getTeachingMaterials.queryOptions({
       authToken: authToken!,
       ...(selectedContentType && { contentType: selectedContentType as any }),
       ...(selectedKnowledgeArea && { knowledgeAreaId: selectedKnowledgeArea as number }),
@@ -64,18 +63,17 @@ export function TeachingMaterialLibrary({ onGenerateQuestions, onClose }: Teachi
 
   // Get knowledge areas for categorization
   const { data: knowledgeAreasData } = useQuery({
-    queryKey: ['knowledgeAreas'],
-    queryFn: () => trpc.getKnowledgeAreas.query({
+    ...trpc.getKnowledgeAreas.queryOptions({
       authToken: authToken!,
     }),
     enabled: !!authToken,
   });
 
-  const knowledgeAreas = knowledgeAreasData?.knowledgeAreas || [];
+  const knowledgeAreas = (knowledgeAreasData as any)?.knowledgeAreas || [];
 
   // Delete material mutation
   const deleteMutation = useMutation({
-    mutationFn: (materialId: number) => trpc.deleteTeachingMaterial.mutate({
+    mutationFn: (materialId: number) => (trpc as any).deleteTeachingMaterial.mutateAsync({
       authToken: authToken!,
       materialId,
     }),
@@ -95,7 +93,7 @@ export function TeachingMaterialLibrary({ onGenerateQuestions, onClose }: Teachi
   const materials = materialsData?.materials || [];
 
   // Filter materials based on search query
-  const filteredMaterials = materials.filter(material => 
+  const filteredMaterials = materials.filter((material: any) => 
     material.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (material.description && material.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
     (material.knowledgeArea?.name.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -215,7 +213,7 @@ export function TeachingMaterialLibrary({ onGenerateQuestions, onClose }: Teachi
                 className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">所有知识领域</option>
-                {knowledgeAreas.map((area) => (
+                {knowledgeAreas.map((area: any) => (
                   <option key={area.id} value={area.id}>
                     {area.name}
                   </option>
@@ -264,7 +262,7 @@ export function TeachingMaterialLibrary({ onGenerateQuestions, onClose }: Teachi
       {/* Materials Grid */}
       {!isLoading && !error && filteredMaterials.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredMaterials.map((material) => (
+          {filteredMaterials.map((material: any) => (
             <div key={material.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
               {/* Header */}
               <div className="flex items-start justify-between mb-3">

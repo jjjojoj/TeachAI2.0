@@ -97,7 +97,7 @@ function parseBatchStudentResponse(text: string): BatchAnalysisResponse {
         confidence: typeof student.confidence === 'number' ? Math.min(Math.max(student.confidence, 0), 1) : 0.7,
         reasoning: typeof student.reasoning === 'string' ? student.reasoning : '自动解析的学生信息',
       };
-    }).filter(student => student.studentName && student.studentName !== `学生${students.indexOf(student) + 1}`);
+    }).filter((student: StudentData) => student.studentName && student.studentName !== `学生${students.indexOf(student) + 1}`);
 
     // Improved auto-assignment strategy for student IDs
     const autoAssignedStudentIds: string[] = [];
@@ -189,19 +189,19 @@ function parseBatchStudentResponse(text: string): BatchAnalysisResponse {
           let id = '';
 
           if (pattern.source.includes('姓名|name')) {
-            name = match[1]?.trim();
-            id = match[2]?.trim();
+            name = match[1]?.trim() ?? '';
+            id = match[2]?.trim() ?? '';
           } else if (pattern.source.includes('\\u4e00-\\u9fff')) {
             // Chinese name pattern
-            name = match[0]?.trim();
+            name = match[0]?.trim() ?? '';
           } else if (pattern.source.includes('\\d.*[^\\s\\d"')) {
-            id = match[1]?.trim();
-            name = match[2]?.trim();
+            id = match[1]?.trim() ?? '';
+            name = match[2]?.trim() ?? '';
           } else if (pattern.source.includes('[^\\s\\d".*\\d')) {
-            name = match[1]?.trim();
-            id = match[2]?.trim();
+            name = match[1]?.trim() ?? '';
+            id = match[2]?.trim() ?? '';
           } else {
-            name = match[0]?.trim();
+            name = match[0]?.trim() ?? '';
           }
 
           if (name && name.length >= 2 && name.length <= 8 &&
@@ -369,7 +369,7 @@ export const analyzeBatchStudents = baseProcedure
 
       try {
         result = await attemptAnalysis(1);
-        console.log(`AI analysis completed successfully. Response length: ${result.text?.length || 0}`);
+        console.log(`AI analysis completed successfully. Response length: ${(result as any).text?.length || 0}`);
 
       } catch (finalError: any) {
         console.error(`All AI analysis attempts failed:`, finalError);
@@ -403,7 +403,7 @@ export const analyzeBatchStudents = baseProcedure
       // Parse the AI response
       let analysisResult;
       try {
-        analysisResult = parseBatchStudentResponse(result.text);
+        analysisResult = parseBatchStudentResponse((result as any).text);
 
         if (!analysisResult || analysisResult.students.length === 0) {
           // If no students found, provide fallback message
@@ -420,7 +420,7 @@ export const analyzeBatchStudents = baseProcedure
         console.error('Failed to parse AI response:', parseError);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: `AI响应解析失败。原始响应: ${result.text?.substring(0, 200) || '空'}`
+          message: `AI响应解析失败。原始响应: ${(result as any).text?.substring(0, 200) || '空'}`
         });
       }
 

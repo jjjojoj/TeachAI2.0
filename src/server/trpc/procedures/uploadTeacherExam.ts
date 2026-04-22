@@ -38,7 +38,7 @@ export const uploadTeacherExam = baseProcedure
         });
       }
 
-      if (student.class.teacher.id !== parsed.teacherId) {
+      if (!student.class || student.class.teacher.id !== parsed.teacherId) {
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "You can only upload exams for students in your classes",
@@ -75,8 +75,8 @@ export const uploadTeacherExam = baseProcedure
           imageUrl: exam.imageUrl,
           createdAt: exam.createdAt,
           student: {
-            name: exam.student.name,
-            className: exam.student.class.name,
+            name: exam.student?.name ?? '',
+            className: exam.student?.class?.name ?? '',
           },
         },
       };

@@ -47,8 +47,6 @@ export function AddStudentModal({ isOpen, onClose, classId }: AddStudentModalPro
         name: data.name,
         email: data.email || undefined,
         studentId: data.studentId || undefined,
-        schoolName: data.schoolName,
-        grade: data.grade,
       });
 
       toast.success('Student added successfully!');

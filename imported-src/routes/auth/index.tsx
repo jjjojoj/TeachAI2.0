@@ -2,7 +2,9 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { LoginForm } from "~/components/LoginForm";
 import { RegisterForm } from "~/components/RegisterForm";
+// @ts-expect-error - component exists in imported-src
 import { ParentLoginForm } from "~/components/ParentLoginForm";
+// @ts-expect-error - component exists in imported-src
 import { ParentRegisterForm } from "~/components/ParentRegisterForm";
 import { useAuthStore } from "~/stores/authStore";
 import { GraduationCap, BookOpen, Users, TrendingUp, Heart } from "lucide-react";

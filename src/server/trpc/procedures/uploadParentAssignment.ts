@@ -46,7 +46,6 @@ export const uploadParentAssignment = baseProcedure
       const assignment = await db.assignment.create({
         data: {
           title: input.title,
-          description: input.description,
           imageUrl: input.imageUrl,
           uploadedBy: "parent",
           studentId: input.childId,
@@ -70,12 +69,11 @@ export const uploadParentAssignment = baseProcedure
         assignment: {
           id: assignment.id,
           title: assignment.title,
-          description: assignment.description,
           imageUrl: assignment.imageUrl,
           createdAt: assignment.createdAt,
           student: {
-            name: assignment.student.name,
-            className: assignment.student.class.name,
+            name: assignment.student?.name ?? '',
+            className: assignment.student?.class?.name ?? '',
           },
         },
       };

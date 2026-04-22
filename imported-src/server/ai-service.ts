@@ -112,6 +112,9 @@ export async function recognizeStudentInfo(
   modelKey: AIModelKey = 'siliconcloud/qwen2.5-vl-7b'
 ) {
   const modelConfig = AI_MODELS[modelKey];
+  if (!modelConfig) {
+    throw new Error(`Model ${modelKey} not found`);
+  }
 
   if (!modelConfig.supportsVision) {
     throw new Error(`Model ${modelKey} does not support vision tasks`);
@@ -248,6 +251,9 @@ export async function analyzeAssignment(
   modelKey: AIModelKey = 'siliconcloud/qwen2.5-vl-7b'
 ) {
   const modelConfig = AI_MODELS[modelKey];
+  if (!modelConfig) {
+    throw new Error(`Model ${modelKey} not found`);
+  }
 
   if (!modelConfig.supportsVision) {
     throw new Error(`Model ${modelKey} does not support vision tasks`);
@@ -347,7 +353,7 @@ export function getAvailableVisionModels() {
     .map(([key, config]) => ({
       key: key as AIModelKey,
       name: config.name,
-      isDefault: config.isDefault || false,
+      isDefault: ('isDefault' in config && config.isDefault) ? config.isDefault : false,
     }));
 }
 

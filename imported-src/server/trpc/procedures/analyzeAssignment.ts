@@ -38,7 +38,7 @@ export const analyzeAssignmentProcedure = baseProcedure
         });
       }
 
-      if (assignment.student.parent?.id !== parsed.parentId) {
+      if (assignment.student?.parent?.id !== parsed.parentId) {
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "You can only analyze your own child's assignments",
@@ -96,7 +96,7 @@ export const analyzeAssignmentProcedure = baseProcedure
             data: {
               description: mistake.description,
               studentId: assignment.studentId,
-              assignmentId: input.assignmentId,
+              analysisId: assignmentAnalysis.id,
               knowledgeAreaId: knowledgeArea.id,
             },
           });
@@ -105,7 +105,7 @@ export const analyzeAssignmentProcedure = baseProcedure
           const existingProficiency = await tx.studentKnowledgeArea.findUnique({
             where: {
               studentId_knowledgeAreaId: {
-                studentId: assignment.studentId,
+                studentId: assignment.studentId!,
                 knowledgeAreaId: knowledgeArea.id,
               },
             },
@@ -116,17 +116,16 @@ export const analyzeAssignmentProcedure = baseProcedure
             await tx.studentKnowledgeArea.update({
               where: { id: existingProficiency.id },
               data: {
-                proficiency: Math.max(0, existingProficiency.proficiency - 0.1),
-                lastUpdated: new Date(),
+                proficiencyLevel: 'beginner',
               },
             });
           } else {
-            // Create new proficiency record starting at 0.5 (neutral)
+            // Create new proficiency record starting slightly below neutral due to mistake
             await tx.studentKnowledgeArea.create({
               data: {
-                studentId: assignment.studentId,
+                studentId: assignment.studentId!,
                 knowledgeAreaId: knowledgeArea.id,
-                proficiency: 0.4, // Start slightly below neutral due to mistake
+                proficiencyLevel: 'beginner',
               },
             });
           }

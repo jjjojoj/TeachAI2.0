@@ -139,7 +139,7 @@ export function AddStudentModal({ isOpen, onClose, classId, onSuccess }: AddStud
 
     // Try to identify header row
     let startRowIndex = 0;
-    const firstLine = lines[0].toLowerCase();
+    const firstLine = (lines[0] ?? '').toLowerCase();
     if (firstLine.includes('姓名') || firstLine.includes('name') || firstLine.includes('学号') || firstLine.includes('id')) {
       startRowIndex = 1;
     }
@@ -148,6 +148,7 @@ export function AddStudentModal({ isOpen, onClose, classId, onSuccess }: AddStud
 
     for (let i = startRowIndex; i < lines.length; i++) {
       const line = lines[i];
+      if (!line) continue;
 
       // Handle various CSV delimiters: comma, semicolon, tab
       let cells = line.split(',');

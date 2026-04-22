@@ -78,7 +78,7 @@ export const assignTeacherToSubject = baseProcedure
       const updatedTeacher = await db.teacher.findUnique({
         where: { id: input.teacherId },
         include: {
-          knowledgeAreas: {
+          teacherKnowledgeAreas: {
             include: {
               knowledgeArea: {
                 select: {
@@ -95,7 +95,7 @@ export const assignTeacherToSubject = baseProcedure
       return {
         success: true,
         teacher: updatedTeacher,
-        assignedSubjects: updatedTeacher?.knowledgeAreas.map(tka => tka.knowledgeArea) || [],
+        assignedSubjects: updatedTeacher?.teacherKnowledgeAreas.map((tka: { knowledgeArea: { id: number; name: string; description: string } }) => tka.knowledgeArea) || [],
       };
     } catch (error) {
       if (error instanceof TRPCError) {

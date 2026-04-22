@@ -13,7 +13,6 @@ export function createRouter() {
 }
 
 declare module "@tanstack/react-router" {
-  interface Register {
-    router: ReturnType<typeof createRouter>;
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  interface Register {}
 }

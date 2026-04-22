@@ -93,7 +93,7 @@ export const getStudentPerformanceTrends = baseProcedure
       const assignmentTrends = assignments
         .filter(a => a.analysis?.grade)
         .map(assignment => ({
-          date: assignment.createdAt.toISOString().split('T')[0],
+          date: assignment.createdAt.toISOString().split('T')[0] ?? '',
           score: parseFloat(assignment.analysis!.grade!) || 0,
           title: assignment.title,
           type: 'assignment' as const,
@@ -103,7 +103,7 @@ export const getStudentPerformanceTrends = baseProcedure
       const examTrends = exams
         .filter(e => e.analysis?.grade)
         .map(exam => ({
-          date: exam.createdAt.toISOString().split('T')[0],
+          date: exam.createdAt.toISOString().split('T')[0] ?? '',
           score: parseFloat(exam.analysis!.grade!) || 0,
           title: exam.title,
           type: 'exam' as const,
@@ -131,7 +131,7 @@ export const getStudentPerformanceTrends = baseProcedure
 
       // Process proficiency trends
       const proficiencyTrends = knowledgeAreaHistory.map(ska => ({
-        date: ska.createdAt.toISOString().split('T')[0],
+        date: ska.createdAt.toISOString().split('T')[0] ?? '',
         knowledgeArea: ska.knowledgeArea.name,
         proficiency: ska.proficiencyLevel === 'advanced' ? 3 : 
                     ska.proficiencyLevel === 'intermediate' ? 2 : 1,
@@ -172,7 +172,7 @@ export const getStudentPerformanceTrends = baseProcedure
       // Group mistakes by date for trend analysis
       const mistakesByDate = new Map<string, number>();
       [...mistakes, ...examMistakes].forEach(mistake => {
-        const date = mistake.createdAt.toISOString().split('T')[0];
+        const date = mistake.createdAt.toISOString().split('T')[0] ?? '';
         mistakesByDate.set(date, (mistakesByDate.get(date) || 0) + 1);
       });
 

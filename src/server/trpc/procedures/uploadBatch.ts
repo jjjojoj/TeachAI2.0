@@ -70,16 +70,10 @@ export const batchParentUploadProcedure = baseProcedure
           const createdAssignment = await tx.assignment.create({
             data: {
               title: assignment.title,
-              description: assignment.description,
               imageUrl: assignment.imageUrl,
               uploadedBy: "parent",
               studentId: input.childId,
               classId: child.classId,
-              metadata: {
-                fileName: assignment.fileName,
-                batchId: `parent-batch-${Date.now()}`,
-                uploadedAt: new Date().toISOString(),
-              },
             },
             include: {
               student: {
@@ -97,7 +91,6 @@ export const batchParentUploadProcedure = baseProcedure
           createdAssignments.push({
             id: createdAssignment.id,
             title: createdAssignment.title,
-            description: createdAssignment.description,
             imageUrl: createdAssignment.imageUrl,
             fileName: assignment.fileName,
             createdAt: createdAssignment.createdAt,
@@ -172,7 +165,7 @@ export const batchTeacherUploadProcedure = baseProcedure
 
       // Check authorization for all students
       for (const student of students) {
-        if (student.class.teacher.id !== parsed.teacherId) {
+        if (!student.class || student.class.teacher.id !== parsed.teacherId) {
           throw new TRPCError({
             code: "FORBIDDEN",
             message: `You don't have access to student: ${student.name}`,
@@ -200,16 +193,10 @@ export const batchTeacherUploadProcedure = baseProcedure
           const createdAssignment = await tx.assignment.create({
             data: {
               title: assignment.title,
-              description: assignment.description,
               imageUrl: assignment.imageUrl,
               uploadedBy: "teacher",
               studentId: assignment.studentId,
               classId: student.classId,
-              metadata: {
-                fileName: assignment.fileName,
-                batchId: `teacher-batch-${Date.now()}`,
-                uploadedAt: new Date().toISOString(),
-              },
             },
             include: {
               student: {
@@ -227,11 +214,10 @@ export const batchTeacherUploadProcedure = baseProcedure
           createdAssignments.push({
             id: createdAssignment.id,
             title: createdAssignment.title,
-            description: createdAssignment.description,
             imageUrl: createdAssignment.imageUrl,
             fileName: assignment.fileName,
-            studentName: createdAssignment.student.name,
-            className: createdAssignment.student.class.name,
+            studentName: createdAssignment.student?.name ?? '',
+            className: createdAssignment.student?.class?.name ?? '',
             createdAt: createdAssignment.createdAt,
           });
         }
@@ -315,8 +301,7 @@ async function analyzeAssignmentAsync(
         await tx.mistake.create({
           data: {
             description: mistake.description,
-            studentId: assignment.studentId,
-            assignmentId: assignmentId,
+            studentId: assignment.studentId!,
             knowledgeAreaId: knowledgeArea.id,
           },
         });
@@ -325,7 +310,7 @@ async function analyzeAssignmentAsync(
         const existingProficiency = await tx.studentKnowledgeArea.findUnique({
           where: {
             studentId_knowledgeAreaId: {
-              studentId: assignment.studentId,
+              studentId: assignment.studentId!,
               knowledgeAreaId: knowledgeArea.id,
             },
           },
@@ -336,17 +321,18 @@ async function analyzeAssignmentAsync(
           await tx.studentKnowledgeArea.update({
             where: { id: existingProficiency.id },
             data: {
-              proficiency: Math.max(0, existingProficiency.proficiency - 0.1),
-              lastUpdated: new Date(),
+              proficiencyLevel: existingProficiency.proficiencyLevel
+                ? String(Math.max(0, parseFloat(existingProficiency.proficiencyLevel) - 0.1))
+                : 'beginner',
             },
           });
         } else {
           // Create new proficiency record starting at 0.4 (below neutral due to mistake)
           await tx.studentKnowledgeArea.create({
             data: {
-              studentId: assignment.studentId,
+              studentId: assignment.studentId!,
               knowledgeAreaId: knowledgeArea.id,
-              proficiency: 0.4,
+              proficiencyLevel: 'beginner',
             },
           });
         }

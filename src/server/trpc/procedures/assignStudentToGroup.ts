@@ -36,7 +36,7 @@ export const assignStudentToGroup = baseProcedure
       }
 
       // Verify that the class belongs to the teacher
-      if (student.class.teacherId !== parsed.teacherId) {
+      if (!student.class || student.class.teacherId !== parsed.teacherId) {
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "You don't have permission to modify this student",

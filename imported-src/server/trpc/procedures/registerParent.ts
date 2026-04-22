@@ -59,14 +59,12 @@ export const registerParent = baseProcedure
     }
 
     // Check if student exists in this class with the provided name
-    const existingStudent = await db.student.findUnique({
+    const existingStudent = await db.student.findFirst({
       where: {
-        schoolName_grade_classId_name: {
-          schoolName: input.childInfo.schoolName,
-          grade: input.childInfo.grade,
-          classId: targetClass.id,
-          name: input.childInfo.name,
-        },
+        schoolName: input.childInfo.schoolName,
+        grade: input.childInfo.grade,
+        classId: targetClass.id,
+        name: input.childInfo.name,
       },
     });
 

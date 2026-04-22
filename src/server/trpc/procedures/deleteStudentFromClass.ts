@@ -34,7 +34,7 @@ export const deleteStudentFromClass = baseProcedure
       }
 
       // Verify that the class belongs to the teacher
-      if (student.class.teacherId !== parsed.teacherId) {
+      if (!student.class || student.class.teacherId !== parsed.teacherId) {
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "You don't have permission to delete this student",
@@ -59,7 +59,7 @@ export const deleteStudentFromClass = baseProcedure
           // Parse the studentId to get the numeric part
           const numericMatch = deletedStudentId.match(/(\d+)/);
           if (numericMatch) {
-            const deletedIdNumber = parseInt(numericMatch[1]);
+            const deletedIdNumber = parseInt(numericMatch[1] ?? '0');
 
             // Get all students in the class with higher student IDs
             const studentsToUpdate = await prisma.student.findMany({
@@ -82,7 +82,7 @@ export const deleteStudentFromClass = baseProcedure
 
               const studentNumericMatch = classStudent.studentId.match(/(\d+)/);
               if (studentNumericMatch) {
-                const studentIdNumber = parseInt(studentNumericMatch[1]);
+                const studentIdNumber = parseInt(studentNumericMatch[1] ?? '0');
 
                 if (studentIdNumber > deletedIdNumber) {
                   // Inherit the previous ID (decrease by 1)

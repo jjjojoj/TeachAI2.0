@@ -114,7 +114,7 @@ export const getUserUploadStatsProcedure = baseProcedure
       const analysisByDate: Record<string, number> = {};
 
       assignments.forEach(assignment => {
-        const dateKey = assignment.createdAt.toISOString().split('T')[0];
+        const dateKey = assignment.createdAt.toISOString().split('T')[0] ?? '';
         uploadsByDate[dateKey] = (uploadsByDate[dateKey] || 0) + 1;
         
         if (assignment.analysis) {
@@ -137,8 +137,8 @@ export const getUserUploadStatsProcedure = baseProcedure
         recentUploads: assignments.slice(0, 10).map(a => ({
           id: a.id,
           title: a.title,
-          studentName: a.student.name,
-          className: a.student.class.name,
+          studentName: a.student?.name ?? '',
+          className: a.student?.class?.name ?? '',
           createdAt: a.createdAt,
           hasAnalysis: !!a.analysis,
         })),
@@ -154,7 +154,7 @@ export const getUserUploadStatsProcedure = baseProcedure
           .map(grade => {
             // Try to extract numeric grade
             const match = grade!.match(/(\d+(?:\.\d+)?)/);
-            return match ? parseFloat(match[1]) : null;
+            return match ? parseFloat(match[1] ?? '0') : null;
           })
           .filter(Boolean) as number[];
 
@@ -275,7 +275,7 @@ export const getSystemStatsProcedure = baseProcedure
       const uploadTrends: Record<string, { parent: number; teacher: number; analyzed: number }> = {};
       
       recentAssignments.forEach(assignment => {
-        const dateKey = assignment.createdAt.toISOString().split('T')[0];
+        const dateKey = assignment.createdAt.toISOString().split('T')[0] ?? '';
         if (!uploadTrends[dateKey]) {
           uploadTrends[dateKey] = { parent: 0, teacher: 0, analyzed: 0 };
         }

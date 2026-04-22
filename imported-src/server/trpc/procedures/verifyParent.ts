@@ -31,13 +31,6 @@ export const verifyParent = baseProcedure
             },
           },
         },
-        select: {
-          id: true,
-          email: true,
-          name: true,
-          createdAt: true,
-          children: true,
-        },
       });
 
       if (!parent) {
@@ -50,14 +43,14 @@ export const verifyParent = baseProcedure
       return {
         parent: {
           id: parent.id,
-          email: parent.email,
           name: parent.name,
-          children: parent.children.map(child => ({
+          phoneNumber: parent.phoneNumber,
+          children: parent.children.map((child: typeof parent.children[number]) => ({
             id: child.id,
             name: child.name,
             schoolName: child.schoolName,
             grade: child.grade,
-            className: child.class.name,
+            className: child.class?.name ?? '',
           })),
         },
       };

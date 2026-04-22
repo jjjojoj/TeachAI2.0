@@ -48,26 +48,27 @@ export function TeachingMaterialUpload({ onSuccess, onClose }: TeachingMaterialU
 
   // Get knowledge areas for categorization
   const { data: knowledgeAreasData } = useQuery({
-    queryKey: ['knowledgeAreas'],
-    queryFn: () => trpc.getKnowledgeAreas.query({
+    ...trpc.getKnowledgeAreas.queryOptions({
       authToken: authToken!,
     }),
     enabled: !!authToken,
   });
 
-  const knowledgeAreas = knowledgeAreasData?.knowledgeAreas || [];
+  const knowledgeAreas = (knowledgeAreasData as any)?.knowledgeAreas || [];
 
   // Upload teaching material mutation
   const uploadMutation = useMutation({
-    mutationFn: trpc.uploadTeachingMaterial.mutationOptions({
+    mutationFn: (data: any) => (trpc as any).uploadTeachingMaterial.mutateAsync({
       authToken: authToken!,
+      ...data,
     }),
   });
 
   // Generate presigned URL mutation
   const presignedUrlMutation = useMutation({
-    mutationFn: trpc.generatePresignedUploadUrl.mutationOptions({
+    mutationFn: (data: any) => (trpc as any).generatePresignedUploadUrl.mutateAsync({
       authToken: authToken!,
+      ...data,
     }),
   });
 
@@ -133,7 +134,7 @@ export function TeachingMaterialUpload({ onSuccess, onClose }: TeachingMaterialU
   const uploadFileToStorage = async (file: File) => {
     try {
       // Get presigned URL
-      const urlData = await presignedUrlMutation.mutateAsync({
+      const urlData: any = await presignedUrlMutation.mutateAsync({
         fileName: file.name,
         fileType: file.type,
         folderName: 'teaching-materials',
@@ -366,7 +367,7 @@ export function TeachingMaterialUpload({ onSuccess, onClose }: TeachingMaterialU
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="">选择知识领域（可选）</option>
-              {knowledgeAreas.map((area) => (
+              {knowledgeAreas.map((area: any) => (
                 <option key={area.id} value={area.id}>
                   {area.name}
                 </option>

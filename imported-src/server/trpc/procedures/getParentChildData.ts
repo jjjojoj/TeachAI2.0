@@ -27,17 +27,19 @@ export const getParentChildData = baseProcedure
               teacher: {
                 select: {
                   name: true,
-                  email: true,
                 },
               },
             },
           },
           assignments: {
             include: {
-              analysis: true,
-              mistakes: {
+              analysis: {
                 include: {
-                  knowledgeArea: true,
+                  mistakes: {
+                    include: {
+                      knowledgeArea: true,
+                    },
+                  },
                 },
               },
             },
@@ -47,22 +49,23 @@ export const getParentChildData = baseProcedure
           },
           exams: {
             include: {
-              mistakes: {
+              analysis: {
                 include: {
-                  knowledgeArea: true,
+                  mistakes: {
+                    include: {
+                      knowledgeArea: true,
+                    },
+                  },
                 },
               },
             },
             orderBy: {
-              date: "desc",
+              createdAt: "desc",
             },
           },
-          knowledgeAreas: {
+          studentKnowledgeAreas: {
             include: {
               knowledgeArea: true,
-            },
-            orderBy: {
-              proficiency: "asc", // Show areas needing most improvement first
             },
           },
           mistakes: {
@@ -93,14 +96,21 @@ export const getParentChildData = baseProcedure
 
       // Calculate statistics
       const totalAssignments = child.assignments.length;
-      const analyzedAssignments = child.assignments.filter(a => a.analysis).length;
+      const analyzedAssignments = child.assignments.filter((a: { analysis: unknown }) => a.analysis).length;
       const totalMistakes = child.mistakes.length;
       const averageScore = child.exams.length > 0 
-        ? child.exams.reduce((sum, exam) => sum + (exam.score || 0), 0) / child.exams.length
+        ? child.exams.reduce((sum: number, exam: { analysis: { grade?: string | null } | null }) => {
+            const gradeStr = exam.analysis?.grade;
+            if (gradeStr) {
+              const parsed = parseFloat(gradeStr);
+              if (!isNaN(parsed)) return sum + parsed;
+            }
+            return sum;
+          }, 0) / child.exams.length
         : null;
 
       // Group mistakes by knowledge area
-      const mistakesByArea = child.mistakes.reduce((acc, mistake) => {
+      const mistakesByArea = child.mistakes.reduce((acc: Record<string, typeof child.mistakes>, mistake: typeof child.mistakes[number]) => {
         if (mistake.knowledgeArea) {
           const areaName = mistake.knowledgeArea.name;
           if (!acc[areaName]) {
@@ -117,10 +127,10 @@ export const getParentChildData = baseProcedure
           name: child.name,
           schoolName: child.schoolName,
           grade: child.grade,
-          class: {
+          class: child.class ? {
             name: child.class.name,
             teacher: child.class.teacher,
-          },
+          } : null,
         },
         statistics: {
           totalAssignments,
@@ -129,10 +139,9 @@ export const getParentChildData = baseProcedure
           averageScore,
           analysisRate: totalAssignments > 0 ? (analyzedAssignments / totalAssignments) * 100 : 0,
         },
-        assignments: child.assignments.map(assignment => ({
+        assignments: child.assignments.map((assignment: typeof child.assignments[number]) => ({
           id: assignment.id,
           title: assignment.title,
-          description: assignment.description,
           imageUrl: assignment.imageUrl,
           uploadedBy: assignment.uploadedBy,
           createdAt: assignment.createdAt,
@@ -142,29 +151,25 @@ export const getParentChildData = baseProcedure
             strengths: assignment.analysis.strengths,
             improvements: assignment.analysis.improvements,
           } : null,
-          mistakesCount: assignment.mistakes.length,
+          mistakesCount: assignment.analysis?.mistakes?.length ?? 0,
         })),
-        exams: child.exams.map(exam => ({
+        exams: child.exams.map((exam: typeof child.exams[number]) => ({
           id: exam.id,
           title: exam.title,
-          score: exam.score,
-          maxScore: exam.maxScore,
-          date: exam.date,
-          mistakesCount: exam.mistakes.length,
+          createdAt: exam.createdAt,
+          mistakesCount: exam.analysis?.mistakes?.length ?? 0,
         })),
-        knowledgeAreas: child.knowledgeAreas.map(ka => ({
+        knowledgeAreas: child.studentKnowledgeAreas.map((ka: typeof child.studentKnowledgeAreas[number]) => ({
           id: ka.knowledgeArea.id,
           name: ka.knowledgeArea.name,
           description: ka.knowledgeArea.description,
-          proficiency: ka.proficiency,
-          lastUpdated: ka.lastUpdated,
+          proficiencyLevel: ka.proficiencyLevel,
         })),
-        recentMistakes: child.mistakes.map(mistake => ({
+        recentMistakes: child.mistakes.map((mistake: typeof child.mistakes[number]) => ({
           id: mistake.id,
           description: mistake.description,
-          frequency: mistake.frequency,
           createdAt: mistake.createdAt,
-          knowledgeArea: mistake.knowledgeArea?.name,
+          knowledgeArea: mistake.knowledgeArea?.name ?? null,
         })),
         mistakesByArea,
       };

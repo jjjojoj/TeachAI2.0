@@ -4,6 +4,8 @@ import {
 } from "~/server/trpc/main";
 import { registerTeacher } from "./procedures/registerTeacher";
 import { loginTeacher } from "./procedures/loginTeacher";
+import { loginParent } from "./procedures/loginParent";
+import { registerParent } from "./procedures/registerParent";
 import { createClass } from "./procedures/createClass";
 import { getTeacherClasses } from "./procedures/getTeacherClasses";
 import { refreshInvitationCode } from "./procedures/refreshInvitationCode";
@@ -54,6 +56,8 @@ export const appRouter = createTRPCRouter({
   // Authentication procedures
   registerTeacher,
   loginTeacher,
+  loginParent,
+  registerParent,
   
   // Class management procedures
   createClass,

@@ -22,7 +22,7 @@ export const verifyTeacher = baseProcedure
         },
         select: {
           id: true,
-          email: true,
+          phoneNumber: true,
           name: true,
           createdAt: true,
         },

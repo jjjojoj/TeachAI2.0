@@ -56,7 +56,7 @@ const compressImage = async (file: File, maxWidth = 1920, maxHeight = 1080, qual
   return new Promise((resolve) => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    const img = new Image();
+    const img = new window.Image();
     
     img.onload = () => {
       // Calculate new dimensions
@@ -310,6 +310,7 @@ export function EnhancedAssignmentUpload({
 
     try {
       const file = files[fileIndex];
+      if (!file) return;
       
       // Compress image
       updateFileStatus("compressing", 10);
@@ -348,7 +349,7 @@ export function EnhancedAssignmentUpload({
       console.error(`Processing error for ${fileId}:`, error);
       const file = files[fileIndex];
       
-      if (file.retryCount < 3) {
+      if (file && file.retryCount < 3) {
         setFiles(prev => prev.map(f => 
           f.id === fileId ? { 
             ...f, 

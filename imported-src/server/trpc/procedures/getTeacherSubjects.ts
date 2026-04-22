@@ -19,11 +19,11 @@ export const getTeacherSubjects = baseProcedure
       const teacher = await db.teacher.findUnique({
         where: { id: parsed.teacherId },
         include: {
-          knowledgeAreas: {
+          teacherKnowledgeAreas: {
             include: {
               knowledgeArea: {
                 include: {
-                  students: {
+                  studentKnowledgeAreas: {
                     include: {
                       student: {
                         include: {
@@ -45,11 +45,6 @@ export const getTeacherSubjects = baseProcedure
                           assignments: {
                             include: {
                               analysis: true,
-                              mistakes: {
-                                include: {
-                                  knowledgeArea: true,
-                                },
-                              },
                             },
                           },
                         },
@@ -84,55 +79,70 @@ export const getTeacherSubjects = baseProcedure
       }
 
       // Process the data to provide subject-specific insights
-      const subjects = teacher.knowledgeAreas.map((tka) => {
+      const subjects = teacher.teacherKnowledgeAreas.map((tka: typeof teacher.teacherKnowledgeAreas[number]) => {
         const knowledgeArea = tka.knowledgeArea;
-        const students = knowledgeArea.students;
+        const studentKnowledgeAreas = knowledgeArea.studentKnowledgeAreas;
         const mistakes = knowledgeArea.mistakes;
 
         // Calculate statistics
-        const totalStudents = students.length;
-        const averageProficiency = students.length > 0 
-          ? students.reduce((sum, s) => sum + s.proficiency, 0) / students.length
+        const totalStudents = studentKnowledgeAreas.length;
+        const averageProficiency = studentKnowledgeAreas.length > 0 
+          ? studentKnowledgeAreas.reduce((sum: number, s: typeof studentKnowledgeAreas[number]) => {
+              const level = s.proficiencyLevel;
+              if (level === 'advanced') return sum + 0.8;
+              if (level === 'intermediate') return sum + 0.5;
+              return sum + 0.2;
+            }, 0) / studentKnowledgeAreas.length
           : 0;
 
         // Group mistakes by frequency to find common problem areas
         const commonMistakes = mistakes
-          .reduce((acc, mistake) => {
+          .reduce((acc: Record<string, { description: string; count: number; students: Set<number> }>, mistake: typeof mistakes[number]) => {
             const key = mistake.description;
             if (!acc[key]) {
               acc[key] = {
                 description: mistake.description,
                 count: 0,
-                students: new Set(),
+                students: new Set<number>(),
               };
             }
-            acc[key].count += mistake.frequency;
-            acc[key].students.add(mistake.student.id);
+            acc[key].count += 1;
+            if (mistake.student?.id) {
+              acc[key].students.add(mistake.student.id);
+            }
             return acc;
           }, {} as Record<string, { description: string; count: number; students: Set<number> }>);
 
         const topMistakes = Object.values(commonMistakes)
-          .map(m => ({
+          .map((m: { description: string; count: number; students: Set<number> }) => ({
             description: m.description,
             count: m.count,
             affectedStudents: m.students.size,
           }))
-          .sort((a, b) => b.count - a.count)
+          .sort((a: { count: number }, b: { count: number }) => b.count - a.count)
           .slice(0, 5);
 
         // Calculate improvement trends (students who need attention)
-        const studentsNeedingAttention = students
-          .filter(s => s.proficiency < 0.6)
-          .map(s => ({
+        const studentsNeedingAttention = studentKnowledgeAreas
+          .filter((s: typeof studentKnowledgeAreas[number]) => {
+            const level = s.proficiencyLevel;
+            return !level || level === 'beginner';
+          })
+          .map((s: typeof studentKnowledgeAreas[number]) => ({
             id: s.student.id,
             name: s.student.name,
-            className: s.student.class.name,
-            proficiency: s.proficiency,
-            recentMistakes: s.student.mistakes.filter(m => 
+            className: s.student.class?.name ?? null,
+            proficiencyLevel: s.proficiencyLevel,
+            recentMistakes: s.student.mistakes.filter((m: typeof s.student.mistakes[number]) => 
               m.knowledgeAreaId === knowledgeArea.id
             ).length,
           }))
-          .sort((a, b) => a.proficiency - b.proficiency);
+          .sort((a: { proficiencyLevel: string | null }, b: { proficiencyLevel: string | null }) => {
+            const levelOrder: Record<string, number> = { beginner: 0, intermediate: 1, advanced: 2 };
+            const aVal = a.proficiencyLevel ? (levelOrder[a.proficiencyLevel] ?? 1) : 0;
+            const bVal = b.proficiencyLevel ? (levelOrder[b.proficiencyLevel] ?? 1) : 0;
+            return aVal - bVal;
+          });
 
         return {
           id: knowledgeArea.id,
@@ -159,7 +169,7 @@ export const getTeacherSubjects = baseProcedure
         subjects,
         totalSubjects: subjects.length,
         totalStudentsAcrossSubjects: [...new Set(
-          subjects.flatMap(s => s.studentsNeedingAttention.map(student => student.id))
+          subjects.flatMap((s: typeof subjects[number]) => s.studentsNeedingAttention.map((student: { id: number }) => student.id))
         )].length,
       };
     } catch (error) {

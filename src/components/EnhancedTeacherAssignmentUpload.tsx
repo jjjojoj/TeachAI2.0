@@ -155,7 +155,7 @@ export function EnhancedTeacherAssignmentUpload({
     watch,
     setValue,
   } = useForm<UploadFormData>({
-    resolver: zodResolver(uploadSchema),
+    resolver: zodResolver(uploadSchema) as any,
     defaultValues: {
       selectedModel: 'siliconcloud/qwen2.5-vl-7b',
       confidenceThreshold: 0.7,
@@ -166,10 +166,18 @@ export function EnhancedTeacherAssignmentUpload({
   const confidenceThreshold = watch('confidenceThreshold');
   const autoAssignStudents = watch('autoAssignStudents');
 
-  const presignedUrlMutation = useMutation(trpc.generatePresignedUploadUrl.mutationOptions());
-  const recognizeStudentMutation = useMutation(trpc.recognizeStudentInfo.mutationOptions());
-  const uploadTeacherAssignmentMutation = useMutation(trpc.uploadTeacherAssignment.mutationOptions());
-  const uploadTeacherExamMutation = useMutation(trpc.uploadTeacherExam.mutationOptions());
+  const presignedUrlMutation = useMutation({
+    mutationFn: (data: any) => (trpc as any).generatePresignedUploadUrl.mutateAsync(data),
+  });
+  const recognizeStudentMutation = useMutation({
+    mutationFn: (data: any) => (trpc as any).recognizeStudentInfo.mutateAsync(data),
+  });
+  const uploadTeacherAssignmentMutation = useMutation({
+    mutationFn: (data: any) => (trpc as any).uploadTeacherAssignment.mutateAsync(data),
+  });
+  const uploadTeacherExamMutation = useMutation({
+    mutationFn: (data: any) => (trpc as any).uploadTeacherExam.mutateAsync(data),
+  });
 
   const validateFile = (file: File): string | null => {
     if (!file.type.startsWith('image/')) {
@@ -315,7 +323,7 @@ export function EnhancedTeacherAssignmentUpload({
     try {
       const folderName = uploadType === "exam" ? "exam-uploads" : "assignment-uploads";
       
-      const urlResponse = await presignedUrlMutation.mutateAsync({
+      const urlResponse: any = await presignedUrlMutation.mutateAsync({
         authToken: authToken!,
         fileName: `teacher-${Date.now()}-${file.name}`,
         fileType: file.type,
@@ -353,6 +361,7 @@ export function EnhancedTeacherAssignmentUpload({
 
     try {
       const file = files[fileIndex];
+      if (!file) return;
       
       // Compress image
       updateFileStatus("compressing", 10);
@@ -368,7 +377,7 @@ export function EnhancedTeacherAssignmentUpload({
 
       // AI Recognition
       updateFileStatus("recognizing", 60);
-      const recognition = await recognizeStudentMutation.mutateAsync({
+      const recognition: any = await recognizeStudentMutation.mutateAsync({
         authToken: authToken!,
         imageUrl: fileUrl,
         modelKey: formData.selectedModel,
@@ -453,7 +462,7 @@ export function EnhancedTeacherAssignmentUpload({
       console.error(`Processing error for ${fileId}:`, error);
       const file = files[fileIndex];
       
-      if (file.retryCount < 3) {
+      if (file && file.retryCount < 3) {
         setFiles(prev => prev.map(f => 
           f.id === fileId ? { 
             ...f, 
@@ -621,7 +630,7 @@ export function EnhancedTeacherAssignmentUpload({
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6">
+      <form onSubmit={handleSubmit(onSubmit as any)} className="p-6 space-y-6">
         {/* Assignment Details and Settings */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div>

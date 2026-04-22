@@ -66,7 +66,7 @@ export const loginParent = baseProcedure
           name: child.name,
           schoolName: child.schoolName,
           grade: child.grade,
-          className: child.class.name,
+          className: child.class?.name ?? '',
         })),
       },
     };

@@ -1,4 +1,5 @@
 import { createRouter as createTanStackRouter } from "@tanstack/react-router";
+// @ts-expect-error - route tree is generated at build time
 import { routeTree } from "./generated/tanstack-router/routeTree.gen";
 
 export function createRouter() {

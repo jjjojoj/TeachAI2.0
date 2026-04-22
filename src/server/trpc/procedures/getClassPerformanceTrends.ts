@@ -121,13 +121,13 @@ export const getClassPerformanceTrends = baseProcedure
       assignments
         .filter(a => a.analysis?.grade)
         .forEach(assignment => {
-          const date = assignment.createdAt.toISOString().split('T')[0];
+          const date = assignment.createdAt.toISOString().split('T')[0] ?? '';
           const score = parseFloat(assignment.analysis!.grade!) || 0;
-          
+
           if (!assignmentsByDate.has(date)) {
             assignmentsByDate.set(date, { scores: [], count: 0 });
           }
-          
+
           const dateData = assignmentsByDate.get(date)!;
           dateData.scores.push(score);
           dateData.count++;
@@ -138,9 +138,9 @@ export const getClassPerformanceTrends = baseProcedure
       exams
         .filter(e => e.analysis?.grade)
         .forEach(exam => {
-          const date = exam.createdAt.toISOString().split('T')[0];
+          const date = exam.createdAt.toISOString().split('T')[0] ?? '';
           const score = parseFloat(exam.analysis!.grade!) || 0;
-          
+
           if (!examsByDate.has(date)) {
             examsByDate.set(date, { scores: [], count: 0 });
           }
@@ -177,7 +177,7 @@ export const getClassPerformanceTrends = baseProcedure
       // Calculate student participation trends
       const participationByDate = new Map<string, Set<number>>();
       [...assignments, ...exams].forEach(item => {
-        const date = item.createdAt.toISOString().split('T')[0];
+        const date = item.createdAt.toISOString().split('T')[0] ?? '';
         if (!participationByDate.has(date)) {
           participationByDate.set(date, new Set());
         }
@@ -223,7 +223,7 @@ export const getClassPerformanceTrends = baseProcedure
 
       const mistakesByDate = new Map<string, number>();
       [...mistakes, ...examMistakes].forEach(mistake => {
-        const date = mistake.createdAt.toISOString().split('T')[0];
+        const date = mistake.createdAt.toISOString().split('T')[0] ?? '';
         mistakesByDate.set(date, (mistakesByDate.get(date) || 0) + 1);
       });
 

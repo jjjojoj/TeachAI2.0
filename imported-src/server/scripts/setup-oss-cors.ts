@@ -20,7 +20,7 @@ export async function setupOSSCORS() {
     ];
 
     // If BASE_URL is set, add it to allowed origins
-    if (env.BASE_URL) {
+    if (env.BASE_URL && corsRules[0]) {
       corsRules[0].allowedOrigin.push(env.BASE_URL);
     }
 
@@ -28,7 +28,7 @@ export async function setupOSSCORS() {
     await ossClient.putBucketCORS(env.OSS_BUCKET, corsRules);
     
     console.log("✅ OSS CORS rules configured successfully");
-    console.log("Allowed origins:", corsRules[0].allowedOrigin);
+    console.log("Allowed origins:", corsRules[0]?.allowedOrigin);
     
     // Verify the configuration
     try {

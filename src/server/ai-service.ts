@@ -158,6 +158,10 @@ export async function recognizeStudentInfo(
 ) {
   const modelConfig = AI_MODELS[modelKey];
 
+  if (!modelConfig) {
+    throw new Error(`Model ${modelKey} not found`);
+  }
+
   if (!modelConfig.supportsVision) {
     throw new Error(`Model ${modelKey} does not support vision tasks`);
   }
@@ -291,6 +295,10 @@ export async function analyzeAssignment(
 ) {
   const modelConfig = AI_MODELS[modelKey];
 
+  if (!modelConfig) {
+    throw new Error(`Model ${modelKey} not found`);
+  }
+
   if (!modelConfig.supportsVision) {
     throw new Error(`Model ${modelKey} does not support vision tasks`);
   }
@@ -417,6 +425,10 @@ function parseQuestionGenerationResponse(text: string) {
 export async function generateTargetedQuestions(input: QuestionGenerationInput) {
   const modelConfig = AI_MODELS[input.modelKey];
 
+  if (!modelConfig) {
+    throw new Error(`Model ${input.modelKey} not found`);
+  }
+
   try {
     // Prepare context from teaching materials
     const knowledgeBaseContext = input.teachingMaterials
@@ -518,7 +530,7 @@ export function getAvailableVisionModels() {
     .map(([key, config]) => ({
       key: key as AIModelKey,
       name: config.name,
-      isDefault: config.isDefault || false,
+      isDefault: 'isDefault' in config ? config.isDefault : false,
     }));
 }
 

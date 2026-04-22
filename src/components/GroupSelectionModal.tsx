@@ -6,11 +6,14 @@ import toast from 'react-hot-toast';
 interface StudentGroup {
   id: number;
   name: string;
-  description?: string;
+  description?: string | null;
   color: string;
   _count: {
     students: number;
   };
+  createdAt?: Date;
+  classId?: number;
+  students?: any[];
 }
 
 interface GroupSelectionModalProps {

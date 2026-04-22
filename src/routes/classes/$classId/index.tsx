@@ -81,6 +81,10 @@ function ClassDetail() {
 
   const trpc = useTRPC();
   const refreshInvitationCodeMutation = useMutation(trpc.refreshInvitationCode.mutationOptions());
+  const deleteStudentMutation = useMutation(trpc.deleteStudentFromClass.mutationOptions());
+  const toggleSpecialAttentionMutation = useMutation(trpc.toggleSpecialAttention.mutationOptions());
+  const assignStudentToGroupMutation = useMutation(trpc.assignStudentToGroup.mutationOptions());
+  const createStudentGroupMutation = useMutation(trpc.createStudentGroup.mutationOptions());
 
   useEffect(() => {
     if (!isAuthenticated || !authToken) {
@@ -161,7 +165,7 @@ function ClassDetail() {
     if (!selectedStudent || !authToken) return;
 
     try {
-      const result = await trpc.deleteStudentFromClass.mutate({
+      const result = await deleteStudentMutation.mutateAsync({
         authToken,
         studentId: selectedStudent.id,
       });
@@ -183,7 +187,7 @@ function ClassDetail() {
     if (!authToken) return;
 
     try {
-      const result = await trpc.toggleSpecialAttention.mutate({
+      const result = await toggleSpecialAttentionMutation.mutateAsync({
         authToken,
         studentId: student.id,
       });
@@ -209,7 +213,7 @@ function ClassDetail() {
     if (!authToken) return;
 
     try {
-      const result = await trpc.assignStudentToGroup.mutate({
+      const result = await assignStudentToGroupMutation.mutateAsync({
         authToken,
         studentId,
         groupId,
@@ -233,7 +237,7 @@ function ClassDetail() {
     if (!authToken) return;
 
     try {
-      const result = await trpc.createStudentGroup.mutate({
+      const result = await createStudentGroupMutation.mutateAsync({
         authToken,
         classId: parseInt(classId),
         name,

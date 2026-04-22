@@ -50,6 +50,7 @@ export const getClassStudents = baseProcedure
               knowledgeArea: true,
             },
           },
+          group: true,
         },
         orderBy: {
           name: 'asc',

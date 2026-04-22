@@ -90,7 +90,7 @@ export function UploadStatsPanel({
   const getUserStatCards = (): StatCard[] => {
     if (!userStatsQuery.data) return [];
 
-    const { summary, analytics } = userStatsQuery.data;
+    const { summary, analytics } = userStatsQuery.data as any;
 
     return [
       {
@@ -315,7 +315,7 @@ export function UploadStatsPanel({
             )}
 
             {/* Analytics Section */}
-            {userStatsQuery.data.analytics && (
+            {(userStatsQuery.data as any)?.analytics && (
               <div className="space-y-4">
                 <button
                   onClick={() => setShowAdvanced(!showAdvanced)}
@@ -335,14 +335,14 @@ export function UploadStatsPanel({
                 {showAdvanced && (
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Top Strengths */}
-                    {userStatsQuery.data.analytics.topStrengths.length > 0 && (
+                    {(userStatsQuery.data as any)?.analytics.topStrengths.length > 0 && (
                       <div className="space-y-3">
                         <h5 className="font-medium text-gray-900 flex items-center">
                           <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
                           Top Strengths
                         </h5>
                         <div className="space-y-2">
-                          {userStatsQuery.data.analytics.topStrengths.map((item, index) => (
+                          {(userStatsQuery.data as any)?.analytics.topStrengths.map((item: any, index: number) => (
                             <div key={index} className="flex items-center justify-between p-2 bg-green-50 rounded">
                               <span className="text-sm text-green-800">{item.strength}</span>
                               <span className="text-xs font-medium text-green-600">{item.count}x</span>
@@ -353,14 +353,14 @@ export function UploadStatsPanel({
                     )}
 
                     {/* Top Improvements */}
-                    {userStatsQuery.data.analytics.topImprovements.length > 0 && (
+                    {(userStatsQuery.data as any)?.analytics.topImprovements.length > 0 && (
                       <div className="space-y-3">
                         <h5 className="font-medium text-gray-900 flex items-center">
                           <TrendingUp className="w-4 h-4 text-blue-600 mr-2" />
                           Areas for Improvement
                         </h5>
                         <div className="space-y-2">
-                          {userStatsQuery.data.analytics.topImprovements.map((item, index) => (
+                          {(userStatsQuery.data as any)?.analytics.topImprovements.map((item: any, index: number) => (
                             <div key={index} className="flex items-center justify-between p-2 bg-blue-50 rounded">
                               <span className="text-sm text-blue-800">{item.improvement}</span>
                               <span className="text-xs font-medium text-blue-600">{item.count}x</span>

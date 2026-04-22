@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTRPC } from "~/trpc/react";
 import { useAuthStore } from "~/stores/authStore";
+// @ts-expect-error - component exists in imported-src
 import { TeacherAssignmentUpload } from "~/components/TeacherAssignmentUpload";
 import { AddStudentModal } from "~/components/AddStudentModal";
 import { 

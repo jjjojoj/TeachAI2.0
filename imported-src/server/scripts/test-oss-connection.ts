@@ -12,11 +12,11 @@ export async function testOSSConnection() {
     console.log("1. Testing basic connection...");
     const buckets = await ossClient.listBuckets();
     console.log("✅ Successfully connected to OSS");
-    console.log(`Found buckets: ${buckets.buckets.map(b => b.name).join(", ")}`);
+    console.log(`Found buckets: ${buckets.buckets.map((b: { name: string }) => b.name).join(", ")}`);
     
     // Test 2: Check if our bucket exists
     console.log("2. Checking bucket existence...");
-    const bucketExists = buckets.buckets.some(b => b.name === env.OSS_BUCKET);
+    const bucketExists = buckets.buckets.some((b: { name: string }) => b.name === env.OSS_BUCKET);
     if (bucketExists) {
       console.log(`✅ Bucket '${env.OSS_BUCKET}' exists`);
     } else {
@@ -61,11 +61,12 @@ export async function testOSSConnection() {
     }
     
     // Check for specific error types
-    if (error.code === 'InvalidAccessKeyId') {
+    const err = error as { code?: string };
+    if (err.code === 'InvalidAccessKeyId') {
       console.error("💡 Solution: Check your OSS_ACCESS_KEY_ID in .env file");
-    } else if (error.code === 'SignatureDoesNotMatch') {
+    } else if (err.code === 'SignatureDoesNotMatch') {
       console.error("💡 Solution: Check your OSS_ACCESS_KEY_SECRET in .env file");
-    } else if (error.code === 'NoSuchBucket') {
+    } else if (err.code === 'NoSuchBucket') {
       console.error("💡 Solution: Create the bucket in Alibaba Cloud console or check OSS_BUCKET name");
     }
     
