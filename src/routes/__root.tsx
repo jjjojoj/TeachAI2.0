@@ -45,10 +45,11 @@ function RootComponent() {
         <div className="min-h-screen bg-gray-50">
           <Outlet />
           <Toaster
-            position="top-right"
+            position="top-center"
             toastOptions={{
               duration: 4000,
               style: {
+                marginTop: '80px',
                 background: '#fff',
                 color: '#374151',
                 boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',

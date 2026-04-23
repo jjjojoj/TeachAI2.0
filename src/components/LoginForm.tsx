@@ -141,17 +141,7 @@ export function LoginForm({ onSuccess, onSwitchToRegister, mode = "teacher" }: L
           </form>
         </div>
 
-        <div className="px-8 py-6 bg-gray-50 border-t border-gray-100">
-          <p className="text-center text-sm text-gray-600">
-            还没有账户？{" "}
-            <button
-              onClick={onSwitchToRegister}
-              className="font-semibold text-blue-600 hover:text-blue-500 transition-colors"
-            >
-              点击注册
-            </button>
-          </p>
-        </div>
+
       </div>
     </div>
   );

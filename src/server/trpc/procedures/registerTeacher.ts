@@ -4,6 +4,7 @@ import bcryptjs from "bcryptjs";
 import { db } from "~/server/db";
 import { baseProcedure } from "~/server/trpc/main";
 import { rateLimiter } from "~/server/trpc/rateLimiter";
+import { env } from "~/server/env";
 
 const phoneRegex = /^1[3-9]\d{9}$/;
 
@@ -17,6 +18,7 @@ export const registerTeacher = baseProcedure
       .regex(/(?=.*[a-z])/, "密码需要包含至少一个小写字母")
       .regex(/(?=.*[A-Z])/, "密码需要包含至少一个大写字母")
       .regex(/(?=.*\d)/, "密码需要包含至少一个数字"),
+    invitationCode: z.string().min(1, "请输入邀请码"),
   }).refine((data) => !data.password.toLowerCase().includes(data.name.toLowerCase()), {
     message: "密码不能包含您的姓名",
     path: ["password"],
@@ -35,6 +37,17 @@ export const registerTeacher = baseProcedure
           code: "CONFLICT",
           message: "该手机号已被注册",
         });
+      }
+
+      // Check invitation code (unless open registration is enabled)
+      if (env.ALLOW_REGISTRATION !== "true") {
+        const validCodes = (env.REGISTRATION_CODES || "").split(",").map((code) => code.trim()).filter(Boolean);
+        if (!validCodes.includes(input.invitationCode)) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "邀请码无效，请联系管理员获取邀请码",
+          });
+        }
       }
 
       // Hash the password

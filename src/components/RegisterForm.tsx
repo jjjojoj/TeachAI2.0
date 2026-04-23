@@ -30,6 +30,7 @@ const registerSchema = z.object({
     .regex(/(?=.*[a-z])/, "密码必须包含至少一个小写字母")
     .regex(/(?=.*[A-Z])/, "密码必须包含至少一个大写字母")
     .regex(/(?=.*\d)/, "密码必须包含至少一个数字"),
+  invitationCode: z.string().min(1, "请输入邀请码"),
 }).refine((data) => !data.password.toLowerCase().includes(data.name.toLowerCase()), {
   message: "密码不能包含您的姓名",
   path: ["password"],
@@ -173,6 +174,25 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
               
               {errors.password && (
                 <p className="text-red-600 text-sm mt-2 animate-slide-down">{errors.password.message}</p>
+              )}
+            </div>
+
+            <div className="animate-slide-up" style={{ animationDelay: '0.25s' }}>
+              <label htmlFor="invitationCode" className="block text-sm font-semibold text-gray-700 mb-2">
+                邀请码
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  {...register("invitationCode")}
+                  type="text"
+                  id="invitationCode"
+                  className="form-input pl-10"
+                  placeholder="请输入邀请码"
+                />
+              </div>
+              {errors.invitationCode && (
+                <p className="text-red-600 text-sm mt-2 animate-slide-down">{errors.invitationCode.message}</p>
               )}
             </div>
 

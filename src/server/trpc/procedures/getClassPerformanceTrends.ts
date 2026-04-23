@@ -188,30 +188,20 @@ export const getClassPerformanceTrends = authedProcedure
       // Calculate mistake trends for the class
       const mistakes = await db.mistake.findMany({
         where: {
-          studentId: {
-            in: studentIds,
-          },
-          createdAt: {
-            gte: startDate,
-          },
+          studentId: { in: studentIds },
+          createdAt: { gte: startDate },
         },
-        orderBy: {
-          createdAt: 'asc',
-        },
+        include: { knowledgeArea: { select: { id: true, name: true } } },
+        orderBy: { createdAt: 'asc' },
       });
 
       const examMistakes = await db.examMistake.findMany({
         where: {
-          studentId: {
-            in: studentIds,
-          },
-          createdAt: {
-            gte: startDate,
-          },
+          studentId: { in: studentIds },
+          createdAt: { gte: startDate },
         },
-        orderBy: {
-          createdAt: 'asc',
-        },
+        include: { knowledgeArea: { select: { id: true, name: true } } },
+        orderBy: { createdAt: 'asc' },
       });
 
       const mistakesByDate = new Map<string, number>();
@@ -233,6 +223,48 @@ export const getClassPerformanceTrends = authedProcedure
         mistakeTrends,
         assignmentTrends,
         examTrends,
+        // Student ranking: per-student average score across assignments + exams
+        studentRanking: students.map(s => {
+          const studentAssignments = assignments.filter(a => a.studentId === s.id && a.analysis?.grade);
+          const studentExams = exams.filter(e => e.studentId === s.id && e.analysis?.grade);
+          const assignmentScores = studentAssignments.map(a => parseFloat(a.analysis!.grade!) || 0);
+          const examScores = studentExams.map(e => parseFloat(e.analysis!.grade!) || 0);
+          const allScores = [...assignmentScores, ...examScores];
+          const avg = allScores.length > 0 ? allScores.reduce((a, b) => a + b, 0) / allScores.length : 0;
+          return {
+            studentId: s.id,
+            studentName: s.name,
+            averageScore: Math.round(avg * 10) / 10,
+            assignmentCount: studentAssignments.length,
+            examCount: studentExams.length,
+            totalItems: allScores.length,
+            assignmentAvg: assignmentScores.length > 0 ? Math.round(assignmentScores.reduce((a, b) => a + b, 0) / assignmentScores.length * 10) / 10 : 0,
+            examAvg: examScores.length > 0 ? Math.round(examScores.reduce((a, b) => a + b, 0) / examScores.length * 10) / 10 : 0,
+          };
+        }).sort((a, b) => b.averageScore - a.averageScore),
+        // Knowledge area analysis: mistake count per knowledge area
+        knowledgeAreaAnalysis: (() => {
+          const areaMap = new Map<number, { name: string; mistakeCount: number; studentCount: Set<number> }>();
+          [...mistakes, ...examMistakes].forEach(m => {
+            const kaId = m.knowledgeAreaId;
+            if (!kaId) return;
+            const kaName = m.knowledgeArea?.name || '未分类';
+            if (!areaMap.has(kaId)) {
+              areaMap.set(kaId, { name: kaName, mistakeCount: 0, studentCount: new Set() });
+            }
+            const entry = areaMap.get(kaId)!;
+            entry.mistakeCount++;
+            entry.studentCount.add(m.studentId);
+          });
+          return Array.from(areaMap.entries())
+            .map(([id, data]) => ({
+              knowledgeAreaId: id,
+              name: data.name,
+              mistakeCount: data.mistakeCount,
+              affectedStudentCount: data.studentCount.size,
+            }))
+            .sort((a, b) => b.mistakeCount - a.mistakeCount);
+        })(),
         summary: {
           totalStudents: students.length,
           totalAssignments: assignments.length,

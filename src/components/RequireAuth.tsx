@@ -23,7 +23,7 @@ export function RequireAuth({ children }: { children: ReactNode }) {
     // from localStorage on mount, by the time this effect fires the store
     // already has its persisted values (or the defaults if nothing was stored).
     if (!isAuthenticated || !authToken) {
-      navigate({ to: "/auth" });
+      navigate({ to: "/" });
     }
   }, [isAuthenticated, authToken, navigate]);
 

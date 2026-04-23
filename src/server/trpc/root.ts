@@ -4,6 +4,7 @@ import {
 } from "~/server/trpc/main";
 import { registerTeacher } from "./procedures/registerTeacher";
 import { loginTeacher } from "./procedures/loginTeacher";
+import { loginDemo } from "./procedures/loginDemo";
 import { loginParent } from "./procedures/loginParent";
 import { registerParent } from "./procedures/registerParent";
 import { createClass } from "./procedures/createClass";
@@ -44,6 +45,8 @@ import { uploadTeachingMaterial } from "./procedures/uploadTeachingMaterial";
 import { getTeachingMaterials } from "./procedures/getTeachingMaterials";
 import { deleteTeachingMaterial } from "./procedures/deleteTeachingMaterial";
 import { generateTargetedQuestionsProcedure } from "./procedures/generateTargetedQuestions";
+import { generateClassQuestionsProcedure } from "./procedures/generateClassQuestions";
+import { getMistakeLibraryProcedure } from "./procedures/getMistakeLibrary";
 
 // Batch student management procedures
 import { analyzeBatchStudents } from "./procedures/analyzeBatchStudents";
@@ -56,6 +59,7 @@ export const appRouter = createTRPCRouter({
   // Authentication procedures
   registerTeacher,
   loginTeacher,
+  loginDemo,
   loginParent,
   registerParent,
   
@@ -119,6 +123,10 @@ export const appRouter = createTRPCRouter({
   
   // AI-powered question generation
   generateTargetedQuestions: generateTargetedQuestionsProcedure,
+  generateClassQuestions: generateClassQuestionsProcedure,
+
+  // Mistake library
+  getMistakeLibrary: getMistakeLibraryProcedure,
   
   // Upload statistics procedures
   getUserUploadStats: getUserUploadStatsProcedure,

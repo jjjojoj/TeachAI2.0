@@ -13,6 +13,7 @@
     "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
+    "seed": "npx tsx prisma/seed.ts",
     "format": "prettier --write ."
   },
   "dependencies": {

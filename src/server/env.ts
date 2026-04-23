@@ -15,6 +15,8 @@ const envSchema = z.object({
   OSS_REGION: z.string(),
   SILICONCLOUD_API_KEY: z.string(),
   ALIBABA_BAILIAN_API_KEY: z.string(),
+  ALLOW_REGISTRATION: z.string().optional(),
+  REGISTRATION_CODES: z.string().optional(),
 });
 
 export const env = envSchema.parse(process.env);

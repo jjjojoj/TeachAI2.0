@@ -1,15 +1,17 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
-import { LoginForm } from "~/components/LoginForm";
-import { RegisterForm } from "~/components/RegisterForm";
+import { useEffect } from "react";
 import { useAuthStore } from "~/stores/authStore";
+import { useToast } from "~/components/Toast";
 import { 
   GraduationCap, 
-  BookOpen, 
   Users, 
   TrendingUp, 
-  Sparkles,
   Brain,
+  LogIn,
+  Phone,
+  Lock,
+  ArrowLeft,
+  Eye,
 } from "lucide-react";
 
 export const Route = createFileRoute("/auth/")({
@@ -17,28 +19,23 @@ export const Route = createFileRoute("/auth/")({
 });
 
 function AuthPage() {
-  const [isLogin, setIsLogin] = useState(true);
   const navigate = useNavigate();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const toast = useToast();
 
   useEffect(() => {
     if (isAuthenticated) {
       const { userRole } = useAuthStore.getState();
       if (userRole === "parent") {
-        navigate({ to: "/parent-dashboard" });
+        navigate({ to: "/parent-dashboard", replace: true });
       } else {
-        navigate({ to: "/dashboard" });
+        navigate({ to: "/dashboard", replace: true });
       }
     }
   }, [isAuthenticated, navigate]);
 
-  const handleAuthSuccess = () => {
-    const { userRole } = useAuthStore.getState();
-    if (userRole === "parent") {
-      navigate({ to: "/parent-dashboard" });
-    } else {
-      navigate({ to: "/dashboard" });
-    }
+  const showNotAvailable = () => {
+    toast.info("注册功能暂未开放，请通过首页「体验演示」入口体验系统");
   };
 
   return (
@@ -51,7 +48,18 @@ function AuthPage() {
       <div className="absolute bottom-20 right-20 w-80 h-80 bg-purple-400/10 rounded-full blur-3xl float-medium"></div>
       <div className="absolute top-1/2 right-1/4 w-32 h-32 bg-indigo-400/10 rounded-full blur-2xl float-fast"></div>
       
-      <div className="relative min-h-screen flex">
+      {/* 返回首页按钮 */}
+      <div className="relative z-20 p-4">
+        <button
+          onClick={() => navigate({ to: "/" })}
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-white/80 backdrop-blur-sm rounded-xl border border-gray-200 hover:bg-white hover:text-gray-900 hover:border-gray-300 transition-all shadow-sm"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          返回首页
+        </button>
+      </div>
+
+      <div className="relative min-h-[calc(100vh-80px)] flex">
         {/* Left Side - Branding */}
         <div className="hidden lg:flex lg:w-1/2 bg-gradient-primary p-12 flex-col justify-center relative overflow-hidden">
           <div className="absolute inset-0 bg-black/10"></div>
@@ -77,7 +85,7 @@ function AuthPage() {
             
             <p className="text-blue-100 text-xl mb-12 leading-relaxed">
               简化作业管理，分析学生表现，获得深度洞察，
-              帮助每个学生取得成功。已有数千名教育工作者在使用我们的平台。
+              帮助每个学生取得成功。
             </p>
 
             <div className="space-y-8">
@@ -111,27 +119,10 @@ function AuthPage() {
                 </div>
               </div>
             </div>
-
-            <div className="mt-12 p-6 bg-white/10 rounded-2xl backdrop-blur-sm">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-white font-bold text-sm mb-1">全球教育工作者信赖</div>
-                  <div className="text-blue-200 text-sm">加入已在使用智评的10,000+教师</div>
-                </div>
-                <div className="flex -space-x-2">
-                  <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full border-2 border-white"></div>
-                  <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full border-2 border-white"></div>
-                  <div className="w-10 h-10 bg-gradient-to-br from-pink-400 to-rose-500 rounded-full border-2 border-white"></div>
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full border-2 border-white flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">+</span>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
-        {/* Right Side - Auth Forms */}
+        {/* Right Side - Disabled Auth Form (visual only) */}
         <div className="flex-1 flex items-center justify-center p-8 lg:p-12">
           <div className="w-full max-w-md animate-slide-up">
             {/* Mobile-only logo */}
@@ -150,19 +141,87 @@ function AuthPage() {
               </div>
             </div>
 
-            {/* Auth Forms */}
+            {/* Visual-only form (disabled) */}
             <div className="animate-scale-in">
-              {isLogin ? (
-                <LoginForm
-                  onSuccess={handleAuthSuccess}
-                  onSwitchToRegister={() => setIsLogin(false)}
-                />
-              ) : (
-                <RegisterForm
-                  onSuccess={() => setIsLogin(true)}
-                  onSwitchToLogin={() => setIsLogin(true)}
-                />
-              )}
+              <div className="w-full max-w-md mx-auto">
+                <div className="card overflow-hidden shadow-glow">
+                  <div className="px-8 pt-8 pb-6">
+                    <div className="text-center mb-8">
+                      <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-glow">
+                        <LogIn className="w-8 h-8 text-white" />
+                      </div>
+                      <h2 className="text-2xl font-bold text-gray-900">欢迎回来</h2>
+                      <p className="text-gray-600 mt-2">登录您的教师账户</p>
+                    </div>
+
+                    <div className="space-y-6">
+                      <div className="animate-slide-up">
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          手机号码
+                        </label>
+                        <div className="relative">
+                          <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                          <input
+                            type="tel"
+                            className="form-input pl-10 bg-gray-50 cursor-not-allowed"
+                            placeholder="请输入手机号码"
+                            disabled
+                            onClick={showNotAvailable}
+                            onFocus={showNotAvailable}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          密码
+                        </label>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                          <input
+                            type="password"
+                            className="form-input pl-10 pr-12 bg-gray-50 cursor-not-allowed"
+                            placeholder="请输入您的密码"
+                            disabled
+                            onClick={showNotAvailable}
+                            onFocus={showNotAvailable}
+                          />
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-300">
+                            <Eye className="w-5 h-5" />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="animate-slide-up" style={{ animationDelay: '0.2s' }}>
+                        <button
+                          type="button"
+                          onClick={showNotAvailable}
+                          className="btn-primary w-full group"
+                        >
+                          登录
+                          <LogIn className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Notice banner */}
+                    <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                      <p className="text-sm text-amber-800 text-center font-medium">
+                        🔒 注册功能暂未开放
+                      </p>
+                      <p className="text-xs text-amber-600 text-center mt-1">
+                        请通过首页「体验演示」入口体验系统
+                      </p>
+                      <button
+                        onClick={() => navigate({ to: "/" })}
+                        className="mt-3 w-full py-2 text-sm font-medium text-amber-700 bg-amber-100 rounded-lg hover:bg-amber-200 transition-colors"
+                      >
+                        前往首页体验演示
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

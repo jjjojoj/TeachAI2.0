@@ -47,7 +47,7 @@ function ClassDetail() {
   const [showAddStudentModal, setShowAddStudentModal] = useState(false);
   const [showAssignmentUpload, setShowAssignmentUpload] = useState(false);
   const [showInvitationCode, setShowInvitationCode] = useState(false);
-  const [timeRange, setTimeRange] = useState<"7d" | "30d" | "90d" | "1y" | "all">("30d");
+  const [timeRange, setTimeRange] = useState<"7d" | "30d" | "90d" | "1y" | "all">("all");
   const [showReportModal, setShowReportModal] = useState(false);
   const [showArchiveModal, setShowArchiveModal] = useState(false);
   const [showTeachingMaterials, setShowTeachingMaterials] = useState(false);
@@ -536,7 +536,13 @@ function InvitationCodeSection({ classData, isRefreshing, onRefresh }: Invitatio
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">剩余时间</span>
                 <span className="text-sm font-medium text-orange-600">
-                  {Math.max(0, Math.ceil((new Date(classData.invitationCodeExpiresAt).getTime() - Date.now()) / (1000 * 60 * 60)))} 小时
+                  {(() => {
+                    const remaining = Math.max(0, new Date(classData.invitationCodeExpiresAt).getTime() - Date.now());
+                    const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
+                    const hours = Math.ceil((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    if (days > 0) return `${days} 天 ${hours} 小时`;
+                    return `${hours} 小时`;
+                  })()}
                 </span>
               </div>
             </div>

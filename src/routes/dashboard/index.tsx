@@ -10,6 +10,9 @@ import { ModalWrapper } from "~/components/ModalWrapper";
 const CreateClassModal = lazy(() => import("~/components/CreateClassModal").then(m => ({ default: m.CreateClassModal })));
 const TeachingMaterialLibrary = lazy(() => import("~/components/TeachingMaterialLibrary").then(m => ({ default: m.TeachingMaterialLibrary })));
 const TargetedQuestionGenerator = lazy(() => import("~/components/TargetedQuestionGenerator").then(m => ({ default: m.TargetedQuestionGenerator })));
+const ClassDataAnalysis = lazy(() => import("~/components/ClassDataAnalysis").then(m => ({ default: m.ClassDataAnalysis })));
+const MistakeLibrary = lazy(() => import("~/components/MistakeLibrary").then(m => ({ default: m.MistakeLibrary })));
+const ReviewSchedule = lazy(() => import("~/components/ReviewSchedule").then(m => ({ default: m.ReviewSchedule })));
 
 const LoadingSpinner = () => <div className="flex items-center justify-center p-8 text-gray-500">加载中...</div>;
 import { 
@@ -44,6 +47,9 @@ function Dashboard() {
   const [isCreateClassModalOpen, setIsCreateClassModalOpen] = useState(false);
   const [showTeachingMaterials, setShowTeachingMaterials] = useState(false);
   const [showQuestionGenerator, setShowQuestionGenerator] = useState(false);
+  const [showDataAnalysis, setShowDataAnalysis] = useState(false);
+  const [showMistakeLibrary, setShowMistakeLibrary] = useState(false);
+  const [showReviewSchedule, setShowReviewSchedule] = useState(false);
   const trpc = useTRPC();
   const toast = useToast();
 
@@ -62,7 +68,7 @@ function Dashboard() {
   const handleLogout = () => {
     logout();
     toast.success("已成功退出登录");
-    navigate({ to: "/auth" });
+    navigate({ to: "/", replace: true });
   };
 
   const handleClassClick = (classId: number) => {
@@ -356,7 +362,10 @@ function Dashboard() {
                     </div>
                   </button>
                   
-                  <button className="w-full p-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-green-400 hover:bg-green-50 transition-all group text-left">
+                  <button
+                    onClick={() => setShowDataAnalysis(true)}
+                    className="w-full p-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-green-400 hover:bg-green-50 transition-all group text-left"
+                  >
                     <div className="flex items-center">
                       <div className="w-10 h-10 bg-green-100 group-hover:bg-green-200 rounded-lg flex items-center justify-center mr-4 transition-colors">
                         <BarChart3 className="w-5 h-5 text-green-600" />
@@ -367,8 +376,11 @@ function Dashboard() {
                       </div>
                     </div>
                   </button>
-                  
-                  <button className="w-full p-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-orange-400 hover:bg-orange-50 transition-all group text-left">
+
+                  <button
+                    onClick={() => setShowReviewSchedule(true)}
+                    className="w-full p-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-orange-400 hover:bg-orange-50 transition-all group text-left"
+                  >
                     <div className="flex items-center">
                       <div className="w-10 h-10 bg-orange-100 group-hover:bg-orange-200 rounded-lg flex items-center justify-center mr-4 transition-colors">
                         <Calendar className="w-5 h-5 text-orange-600" />
@@ -380,7 +392,10 @@ function Dashboard() {
                     </div>
                   </button>
 
-                  <button className="w-full p-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-red-400 hover:bg-red-50 transition-all group text-left">
+                  <button
+                    onClick={() => setShowMistakeLibrary(true)}
+                    className="w-full p-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-red-400 hover:bg-red-50 transition-all group text-left"
+                  >
                     <div className="flex items-center">
                       <div className="w-10 h-10 bg-red-100 group-hover:bg-red-200 rounded-lg flex items-center justify-center mr-4 transition-colors">
                         <Target className="w-5 h-5 text-red-600" />
@@ -421,6 +436,33 @@ function Dashboard() {
         <Suspense fallback={<LoadingSpinner />}>
           <TargetedQuestionGenerator
             onClose={() => setShowQuestionGenerator(false)}
+          />
+        </Suspense>
+      </ModalWrapper>
+
+      {/* Data Analysis */}
+      <ModalWrapper isOpen={showDataAnalysis} onClose={() => setShowDataAnalysis(false)} maxWidth="max-w-6xl">
+        <Suspense fallback={<LoadingSpinner />}>
+          <ClassDataAnalysis
+            onClose={() => setShowDataAnalysis(false)}
+          />
+        </Suspense>
+      </ModalWrapper>
+
+      {/* Mistake Library */}
+      <ModalWrapper isOpen={showMistakeLibrary} onClose={() => setShowMistakeLibrary(false)} maxWidth="max-w-5xl">
+        <Suspense fallback={<LoadingSpinner />}>
+          <MistakeLibrary
+            onClose={() => setShowMistakeLibrary(false)}
+          />
+        </Suspense>
+      </ModalWrapper>
+
+      {/* Review Schedule */}
+      <ModalWrapper isOpen={showReviewSchedule} onClose={() => setShowReviewSchedule(false)} maxWidth="max-w-4xl">
+        <Suspense fallback={<LoadingSpinner />}>
+          <ReviewSchedule
+            onClose={() => setShowReviewSchedule(false)}
           />
         </Suspense>
       </ModalWrapper>
