@@ -3,6 +3,22 @@ import { TRPCError } from "@trpc/server";
 import { db } from "~/server/db";
 import { authedProcedure } from "~/server/trpc/main";
 
+// Convert letter grade to numeric score (0-100 scale)
+function gradeToScore(grade: string): number {
+  const g = grade.trim().toUpperCase();
+  const gradeMap: Record<string, number> = {
+    'A+': 98, 'A': 95, 'A-': 92,
+    'B+': 88, 'B': 85, 'B-': 82,
+    'C+': 78, 'C': 75, 'C-': 72,
+    'D+': 68, 'D': 65, 'D-': 62,
+    'F': 50,
+  };
+  if (gradeMap[g] !== undefined) return gradeMap[g];
+  // Try parsing as number directly (e.g. "85", "90/100")
+  const parsed = parseFloat(g.replace(/\/\d+$/, ''));
+  return isNaN(parsed) ? 0 : Math.min(parsed, 100);
+}
+
 export const getClassPerformanceTrends = authedProcedure
   .input(z.object({ 
     classId: z.number(),
@@ -115,7 +131,7 @@ export const getClassPerformanceTrends = authedProcedure
         .filter(a => a.analysis?.grade)
         .forEach(assignment => {
           const date = assignment.createdAt.toISOString().split('T')[0] ?? '';
-          const score = parseFloat(assignment.analysis!.grade!) || 0;
+          const score = gradeToScore(assignment.analysis!.grade!);
 
           if (!assignmentsByDate.has(date)) {
             assignmentsByDate.set(date, { scores: [], count: 0 });
@@ -132,7 +148,7 @@ export const getClassPerformanceTrends = authedProcedure
         .filter(e => e.analysis?.grade)
         .forEach(exam => {
           const date = exam.createdAt.toISOString().split('T')[0] ?? '';
-          const score = parseFloat(exam.analysis!.grade!) || 0;
+          const score = gradeToScore(exam.analysis!.grade!);
 
           if (!examsByDate.has(date)) {
             examsByDate.set(date, { scores: [], count: 0 });
@@ -227,8 +243,8 @@ export const getClassPerformanceTrends = authedProcedure
         studentRanking: students.map(s => {
           const studentAssignments = assignments.filter(a => a.studentId === s.id && a.analysis?.grade);
           const studentExams = exams.filter(e => e.studentId === s.id && e.analysis?.grade);
-          const assignmentScores = studentAssignments.map(a => parseFloat(a.analysis!.grade!) || 0);
-          const examScores = studentExams.map(e => parseFloat(e.analysis!.grade!) || 0);
+          const assignmentScores = studentAssignments.map(a => gradeToScore(a.analysis!.grade!));
+          const examScores = studentExams.map(e => gradeToScore(e.analysis!.grade!));
           const allScores = [...assignmentScores, ...examScores];
           const avg = allScores.length > 0 ? allScores.reduce((a, b) => a + b, 0) / allScores.length : 0;
           return {

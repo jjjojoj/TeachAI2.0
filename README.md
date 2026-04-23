@@ -303,8 +303,8 @@ edureview/
 ### 1. 克隆项目
 
 ```bash
-git clone -b dev https://github.com/jjjojoj/hui-xi.git
-cd hui-xi
+git clone -b dev https://github.com/jjjojoj/edureview.git
+cd edureview
 ```
 
 ### 2. 安装依赖
